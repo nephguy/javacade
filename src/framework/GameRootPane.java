@@ -2,8 +2,6 @@ package framework;
 
 import java.util.ArrayList;
 
-import framework.sprite.*;
-
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BackgroundImage;
@@ -80,10 +78,10 @@ public abstract class GameRootPane extends StackPane {
 	Background currentBackground;
 	
 	public GameRootPane (String gamePackageName, String gameTitle, String backgroundMusicFileName) {
-		this(gamePackageName,gameTitle,"press-start.ttf",backgroundMusicFileName,50);
+		this(gamePackageName,gameTitle,"press-start.ttf",backgroundMusicFileName,50,60);
 	}
 	
-	public GameRootPane (String gamePackageName, String gameTitle, String localFont, String backgroundMusicFileName, double musicVolume) {
+	public GameRootPane (String gamePackageName, String gameTitle, String localFont, String backgroundMusicFileName, double musicVolume, double fps) {
 		// create and add content pane
 		contentPane = new StackPane();
 		this.getChildren().add(contentPane);
@@ -127,7 +125,7 @@ public abstract class GameRootPane extends StackPane {
 			
 			update();
 		};
-		gameLoop = new Timeline (new KeyFrame(Duration.millis(16.6), gameUpdate));
+		gameLoop = new Timeline (new KeyFrame(Duration.millis(1000/fps), gameUpdate));
 		gameLoop.setCycleCount(Animation.INDEFINITE);
 	}
 	
