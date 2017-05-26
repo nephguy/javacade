@@ -1,4 +1,4 @@
-package framework.sprite;
+package framework;
 
 import javafx.scene.shape.Path;
 import javafx.scene.shape.MoveTo;
@@ -6,7 +6,6 @@ import javafx.scene.shape.VLineTo;
 import javafx.util.Duration;
 import javafx.scene.shape.HLineTo;
 import javafx.scene.paint.Paint;
-import framework.Util;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -219,7 +218,7 @@ public class PixelSprite extends Path {
 		translate = new Timeline ();
 		double maxX = this.getParent().getScene().getWidth();
 		double maxY = this.getParent().getScene().getHeight();
-		translate.getKeyFrames().add(new KeyFrame(Duration.millis(timeInMs),new KeyValue(this.translateXProperty()Util.clamp(x/maxX)*maxX-maxX/2)));
+		translate.getKeyFrames().add(new KeyFrame(Duration.millis(timeInMs),new KeyValue(this.translateXProperty(),Util.clamp(x/maxX)*maxX-maxX/2)));
 		translate.getKeyFrames().add(new KeyFrame(Duration.millis(timeInMs),new KeyValue(this.translateYProperty(),Util.clamp(y/maxY)*maxY-maxY/2)));
 		if (cycle) {
 			translate.setAutoReverse(cycle);
@@ -354,14 +353,22 @@ public class PixelSprite extends Path {
 	
 /****************************************************************************************************/	
 	
+	/**Returns a boolean representing if this sprite has collided with the ONE other sprite specified**/
+	public boolean collided (Node other) {
+		return this.getBoundsInParent().intersects(other.getBoundsInParent());
+	}
+	
 	/**Returns a boolean representing if this sprite has collided with ANY other sprite with the specified id.
 	 * Used to check for collisions with a family of nodes
 	 * @param id the id of the group of nodes for which to check collision
 	 * **/
 	public boolean collided (String id) {
 		ObservableList<Node> children = this.getParent().getChildrenUnmodifiable();
-		for (int i = 0; i < children.size(); i++)
-			if (this.collided(children.get(i)) && children.get(i).getId().equals(id)) return true;
+		for (int i = 0; i < children.size(); i++) {
+			try {
+				if (this.collided(children.get(i)) && children.get(i).getId().equals(id)) return true;
+			} catch (NullPointerException e) {} // is thrown if the node has no id. this then skips that node.
+		}
 		return false;
 	}
 	
@@ -377,21 +384,12 @@ public class PixelSprite extends Path {
 	 * **/
 	public Node getCollided (String id) {
 		ObservableList<Node> children = this.getParent().getChildrenUnmodifiable();
-		for (int i = 0; i < children.size(); i++)
-			if (this.collided(children.get(i)) && children.get(i).getId().equals(id)) return children.get(i);
+		for (int i = 0; i < children.size(); i++) {
+			try {
+				if (this.collided(children.get(i)) && children.get(i).getId().equals(id)) return children.get(i);
+			} catch (NullPointerException e) {} // is thrown if the node has no id. this then skips that node.
+		}
 		return null;
-	}
-	
-	/**Returns a boolean representing if this sprite has collided with the ONE other sprite specified**/
-	public boolean collided (Node other) {
-		return this.getBoundsInParent().intersects(other.getBoundsInParent());
-	}
-	
-	/**Returns the node specified if this sprite has collided with it.
-	 * Otherwise, returns null.**/
-	public Node getCollided (Node other) {
-		if (collided(other)) return other;
-		else return null;
 	}
 	
 /****************************************************************************************************/

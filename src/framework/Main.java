@@ -24,6 +24,8 @@ public class Main extends Application {
 		stage.sizeToScene();
 		stage.setTitle("Javacade");
 		stage.show();
+		//TODO - SET ICON
+		//stage.getIcons().add(image)
 	}
 	
 	public static void main (String[] args) {

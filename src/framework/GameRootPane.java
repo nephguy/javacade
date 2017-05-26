@@ -10,7 +10,6 @@ import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -85,6 +84,10 @@ public abstract class GameRootPane extends StackPane {
 	}
 	
 	public GameRootPane (String gamePackageName, String gameTitle, String localFont, String backgroundMusicFileName, double musicVolume) {
+		// create and add content pane
+		contentPane = new StackPane();
+		this.getChildren().add(contentPane);
+		
 		// initialize object variables
 		if (localFont.equalsIgnoreCase("default") || localFont.equals(null) || localFont.equals("")) font = "press-start.ttf";
 		else font = localFont;
@@ -126,10 +129,6 @@ public abstract class GameRootPane extends StackPane {
 		};
 		gameLoop = new Timeline (new KeyFrame(Duration.millis(16.6), gameUpdate));
 		gameLoop.setCycleCount(Animation.INDEFINITE);
-		
-		// create and add content pane
-		contentPane = new StackPane();
-		this.getChildren().add(contentPane);
 	}
 	
 	/****************************************PRIVATE FUNCTIONS****************************************/
@@ -185,8 +184,8 @@ public abstract class GameRootPane extends StackPane {
 	 * @param bgFill the background of the main menu.
 	 * **/
 	protected void initMenu (double titleSize, double menuElementSize, String menuMusicFileName, Paint bgFill) { 
-		this.initMenu(titleSize, menuElementSize, menuMusicFileName);
 		this.setBackground(bgFill);
+		this.initMenu(titleSize, menuElementSize, menuMusicFileName);
 	}
 	
 	/**HIGHLY SUGGESTED to run this function in the game's constructor to create your game's main menu.
@@ -198,8 +197,8 @@ public abstract class GameRootPane extends StackPane {
 	 * @param bgImage the background of the main menu
 	 * **/
 	protected void initMenu (double titleSize, double menuElementSize, String menuMusicFileName, ImageView bgImage) { 
-		this.initMenu(titleSize, menuElementSize, menuMusicFileName);
 		this.setBackground(bgImage);
+		this.initMenu(titleSize, menuElementSize, menuMusicFileName);
 	}
 	
 	private void initMenu (double titleSize, double menuElementSize, String menuMusicFileName) {
@@ -286,19 +285,40 @@ public abstract class GameRootPane extends StackPane {
 	
 	/**Pauses/unpauses the game and manages the pause screen**/
 	protected void togglePause() {
+		PixelSprite p;
 		if (!paused) {
-			onPause();
-			gameLoop.pause();
-			paused = true;
+			// automatically pauses currently running animated sprites
+			for (int i = 0; i < this.getChildren().size(); i++) {
+				if (this.getChildren().get(i) instanceof PixelSprite) {
+					p = (PixelSprite)this.getChildren().get(i);
+					p.pause();
+					this.getChildren().set(i, p);
+				}
+			}
+			
+			// normal pause actions
 			addPane(pauseScreen);
+			paused = true;
+			onPause();
 			bgMusic.pause();
+			gameLoop.pause();
 		}
 		else {
+			// automatically resumes currently paused animated sprites
+			for (int i = 0; i < this.getChildren().size(); i++) {
+				if (this.getChildren().get(i) instanceof PixelSprite) {
+					p = (PixelSprite)this.getChildren().get(i);
+					p.resume();
+					this.getChildren().set(i, p);
+				}
+			}
+			
+			// normal pause actions
 			removePane(pauseScreen);
-			bgMusic.play();
-			onResume();
-			gameLoop.play();
 			paused = false;
+			onResume();
+			bgMusic.play();
+			gameLoop.play();
 		}
 	}
 	
@@ -423,10 +443,13 @@ public abstract class GameRootPane extends StackPane {
 		contentPane.getChildren().add(sprite);
 		sprite.moveTo(x, y);
 	}
-	public void addSprite (PixelSprite sprite) {
+	public void addSprite (Node sprite) {
 		contentPane.getChildren().add(sprite);
 	}
-	public void removeSprite (PixelSprite sprite) {
+	public void addSprite (Node... sprites) {
+		contentPane.getChildren().addAll(sprites);
+	}
+	public void removeSprite (Node sprite) {
 		contentPane.getChildren().remove(sprite);
 	}
 }

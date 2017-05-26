@@ -13,7 +13,6 @@ public class Curveball extends GameRootPane {
 	
 	PixelSprite test;
 	PixelSprite test2;
-	PixelSprite ySprite;
 	
 	public Curveball () {
 		super("curveball", "Curveball", "TroyBoi - On My Own.mp3");
@@ -81,39 +80,27 @@ public class Curveball extends GameRootPane {
 		test = new PixelSprite (sprite,Color.BLUE,50,50);
 		test2 = new PixelSprite (sprite,Color.BLACK,50,50,"test2");
 		
-		int[][] ysprite = new int [][]{{0,0,0,0,1,1,0,0,0,0},
-			  						   {0,0,0,0,1,1,0,0,0,0},
-			  						   {0,0,0,0,1,1,0,0,0,0},
-			  						   {0,0,0,0,1,1,0,0,0,0},
-			  						   {0,0,0,0,1,1,0,0,0,0},
-			  						   {0,0,0,1,1,1,1,0,0,0},
-			  						   {0,0,1,1,0,0,1,1,0,0},
-			  						   {0,1,1,0,0,0,0,1,1,0},
-			  						   {1,1,0,0,0,0,0,0,1,1},
-			  						   {1,1,0,0,0,0,0,0,1,1}};
-        ySprite = new PixelSprite (ysprite,Color.PINK,100,100);
-		
 		test.translateAnimation(20, 100, 250, true, true);
 		
-		this.getChildren().addAll(test,test2,ySprite);
-		ySprite.moveTo(200, -50);
+		this.addSprite(test, test2);
 		test2.moveTo(100, 100);
 		test2.translateAnimation(0, 100, 1000, true, false);
 		test2.rotateAnimation(360, 1000, true, false);
 	}
 	
 	public void update() {
-		if (test.collided("test2")) this.getChildren().remove(test2);
+		if (test.collided("test2")) {
+			System.out.println("collided");
+			this.removeSprite(test.getCollided("test2"));
+		}
 	}
 	
 	public void onPause () {
-		test.pauseRotate();
-		test.pauseTranslate();
+		
 	}
 	
 	public void onResume () {
-		test.resumeRotate();
-		test.resumeTranslate();
+		
 	}
 	
 }
