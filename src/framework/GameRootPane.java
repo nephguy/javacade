@@ -437,17 +437,21 @@ public abstract class GameRootPane extends StackPane {
 		this.getChildren().remove(node);
 	}
 	
-	public void addSprite (PixelSprite sprite, double x, double y) {
+	public void addSprite (Sprite sprite, double x, double y) {
 		contentPane.getChildren().add(sprite);
 		sprite.moveTo(x, y);
 	}
-	public void addSprite (Node sprite) {
+	public void addSprite (Sprite sprite) {
 		contentPane.getChildren().add(sprite);
+		sprite.moveTo(0, 0);
 	}
-	public void addSprite (Node... sprites) {
+	public void addSprite (Sprite... sprites) {
 		contentPane.getChildren().addAll(sprites);
+		for (int i = 0; i < sprites.length; i++) {
+			sprites[i].moveTo(1, 1);
+		}
 	}
-	public void removeSprite (Node sprite) {
+	public void removeSprite (Sprite sprite) {
 		contentPane.getChildren().remove(sprite);
 	}
 }

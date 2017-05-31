@@ -1,10 +1,13 @@
 package framework;
 
+import java.util.ArrayList;
+
 import javafx.scene.shape.Path;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.VLineTo;
-import javafx.util.Duration;
 import javafx.scene.shape.HLineTo;
+import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 import javafx.scene.paint.Paint;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -14,13 +17,12 @@ import javafx.animation.Animation.Status;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 
 /**
  * @author Nick Hansen
  */
 
-public class PixelSprite extends Path {
+public class PixelSprite extends Sprite {
 	
 	boolean constrainToScene;
 	
@@ -31,6 +33,11 @@ public class PixelSprite extends Path {
 	private boolean interruptScale = false;
 	private boolean interruptRotate = false;
 	
+	// needed for moveTo
+	double height;
+	double width;
+	
+	ArrayList<Rectangle> pixels;
 	
 	/**Creates a pixelated sprite.
 	 * An array of integers is passed in to define which pixels to draw.
@@ -64,35 +71,46 @@ public class PixelSprite extends Path {
 	 * @param realWidth width of the entire sprite, NOT each pixel
 	 * @param id id of this sprite, used in checking collisions
 	 * **/
-	public PixelSprite (int[][] pixels, Paint fill, double realHeight, double realWidth, String id) {
+	public PixelSprite (int[][] pixels, double realHeight, double realWidth, String id, Paint... fills) {
 		double pHeight = realHeight / pixels.length;
 		double pWidth = realWidth / pixels[0].length;
+		height = realHeight;
+		width = realWidth;
+		
+		Path[] paths = new Path[fills.length]; 
+		for (int i = 0; i < paths.length; i++) {
+			paths[i] = new Path();
+			paths[i].setFill(fills[i]);
+			paths[i].setId(id);
+			paths[i].setStrokeWidth(0);
+		}
 		
 		for (int y = 0; y < pixels.length; y++) {
-			this.getElements().add(new MoveTo(0,pHeight*y));
 			for (int x = 0; x < pixels[y].length; x++) {
-				if (pixels[y][x] != 0) {
-					this.getElements().add(new VLineTo(pHeight*(y+1)));
-					this.getElements().add(new HLineTo(pWidth*(x+1)));
-					this.getElements().add(new VLineTo(pHeight*y));
-					this.getElements().add(new HLineTo(pWidth*x));
+				final int pixelNum = pixels[y][x];
+				if (pixelNum != 0) {
+					paths[pixelNum-1].getElements().add(new MoveTo(pWidth*x,pHeight*y));
+					paths[pixelNum-1].getElements().add(new VLineTo(pHeight*(y+1)));
+					paths[pixelNum-1].getElements().add(new HLineTo(pWidth*(x+1)));
+					paths[pixelNum-1].getElements().add(new VLineTo(pHeight*y));
+					paths[pixelNum-1].getElements().add(new HLineTo(pWidth*x));
 				}
-				this.getElements().add(new MoveTo(pWidth*(x+1),pHeight*y));
 			}
 		}
 		
-		setStrokeWidth(0);
-		setFill(fill);
 		constrainToScene = true;
 		setId(id);
+		this.setMaxSize(realWidth, realHeight);
+		this.setMinSize(realWidth, realHeight);
+		for (Path p : paths) {this.getChildren().add(p);}
 	}
 	
 	/**SEE OTHER CONSTRUCTOR FOR DETAILED EXPLANATION OF THIS CLASS
 	 * <p>
 	 * Creates a pixel sprite without an id.
 	 * **/
-	public PixelSprite (int[][] pixels, Paint fill, double realHeight, double realWidth) {
-		this(pixels,fill,realHeight,realWidth,"");
+	public PixelSprite (int[][] pixels, double realHeight, double realWidth, Paint... fills) {
+		this(pixels,realHeight,realWidth,"",fills);
 	}
 	
 /****************************************************************************************************/
@@ -124,15 +142,6 @@ public class PixelSprite extends Path {
 		scale.play();
 	}
 	
-	/**Pauses any currently running scale animation.<p>HIGHLY SUGGESTED to be run in onPause().**/
-	public void pauseScale () {
-		scale.pause();
-	}
-	/**Resumes any currently running scale animation.<p>HIGHLY SUGGESTED to be run in onResume().**/
-	public void resumeScale () {
-		if (scale.getStatus() == Status.PAUSED) scale.play();
-	}
-	
 /****************************************************************************************************/
 	
 	/**Immediately translate the sprite by the specified amounts.
@@ -148,11 +157,12 @@ public class PixelSprite extends Path {
 	public void translate (double x, double y) {
 		if (interruptTranslate && translate.getCurrentRate() != 0) translate.stop();
 		if (constrainToScene) {
+			double maxWidth = this.getScene().getWidth();
+			double maxHeight = this.getScene().getHeight();
 			Bounds bounds = this.getBoundsInParent();
-			Scene pScene = this.getScene();
-			if (bounds.getMaxX() + x > pScene.getWidth() ||
+			if (bounds.getMaxX() + x > maxWidth ||
 				bounds.getMinX() + x < 0 ||
-				bounds.getMaxY() + y > pScene.getHeight() ||
+				bounds.getMaxY() + y > maxHeight ||
 				bounds.getMinY() + y < 0) return;
 		}
 		this.setTranslateX(this.getTranslateX() + x);
@@ -179,15 +189,6 @@ public class PixelSprite extends Path {
 		translate.play();
 	}
 	
-	/**Pauses any currently running translate animation.<p>HIGHLY SUGGESTED to be run in onPause().**/
-	public void pauseTranslate () {
-		translate.pause();
-	}
-	/**Resumes any currently running scale animation.<p>HIGHLY SUGGESTED to be run in onResume().**/
-	public void resumeTranslate () {
-		if (translate.getStatus() == Status.PAUSED) translate.play();
-	}
-	
 /****************************************************************************************************/
 	
 	/**Immediately moves the sprite to the specified coordinates.
@@ -201,8 +202,8 @@ public class PixelSprite extends Path {
 		if (interruptTranslate && translate.getCurrentRate() != 0) translate.stop();
 		double maxX = this.getParent().getScene().getWidth();
 		double maxY = this.getParent().getScene().getHeight();
-		this.setTranslateX(Util.clamp(x/maxX)*maxX-maxX/2);
-		this.setTranslateY(Util.clamp(y/maxY)*maxY-maxY/2);
+		this.setTranslateX(Util.clamp(x/maxX)*maxX - maxX/2 + width/2);
+		this.setTranslateY(Util.clamp(y/maxY)*maxY - maxY/2 + height/2);
 	}
 	
 	/**Smoothly moves the sprite from its current position to the specified position over a period of time. 
@@ -257,15 +258,6 @@ public class PixelSprite extends Path {
 			rotate.setCycleCount(Animation.INDEFINITE);
 		}
 		rotate.play();
-	}
-	
-	/**Pauses any currently running rotate animation.<p>HIGHLY SUGGESTED to be run in onPause().**/
-	public void pauseRotate () {
-		rotate.pause();
-	}
-	/**Pauses any currently running rotate animation.<p>HIGHLY SUGGESTED to be run in onResume().**/
-	public void resumeRotate () {
-		if (rotate.getStatus() == Status.PAUSED) rotate.play();
 	}
 	
 /****************************************************************************************************/
