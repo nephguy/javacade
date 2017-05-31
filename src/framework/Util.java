@@ -108,4 +108,24 @@ public class Util {
 	    return value < 0 ? 0 : value > 1 ? 1 : value;
 	}
 	
+	/**Returns the maximum value of a 2d array of ints**/
+	public static int maxVal (int[][] a) {
+		int max = 0;
+		for (int[] row : a) {
+			for (int col : row) {
+				max = (col > max) ? col : max;
+			}
+		}
+		return max;
+	}
+	
+	/**Returns the maximum value of an array of ints**/
+	public static int maxVal (int[] a) {
+		int max = 0;
+		for (int val : a) {
+			max = (val > max) ? val : max;
+		}
+		return max;
+	}
+	
 }

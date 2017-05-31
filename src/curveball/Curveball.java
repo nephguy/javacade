@@ -1,7 +1,6 @@
 package curveball;
 
 import framework.*;
-import framework.sprite.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 
@@ -21,6 +20,7 @@ public class Curveball extends GameRootPane {
 			public KeyCode getKey() {return KeyCode.W;}
 			public boolean fireOnce() {return false;}
 			public void action () {
+				test2.translate(0, -5);
 				test.translate(0, -5);
 			}
 		});
@@ -28,6 +28,7 @@ public class Curveball extends GameRootPane {
 			public KeyCode getKey() {return KeyCode.S;}
 			public boolean fireOnce() {return false;}
 			public void action () {
+				test2.translate(0, 5);
 				test.translate(0, 5);
 			}
 		});
@@ -35,6 +36,7 @@ public class Curveball extends GameRootPane {
 			public KeyCode getKey() {return KeyCode.A;}
 			public boolean fireOnce() {return false;}
 			public void action () {
+				test2.translate(-5, 0);
 				test.translate(-5, 0);
 			}
 		});
@@ -42,6 +44,7 @@ public class Curveball extends GameRootPane {
 			public KeyCode getKey() {return KeyCode.D;}
 			public boolean fireOnce() {return false;}
 			public void action () {
+				test2.translate(5, 0);
 				test.translate(5, 0);
 			}
 		});
@@ -49,21 +52,21 @@ public class Curveball extends GameRootPane {
 			public KeyCode getKey() {return KeyCode.Q;}
 			public boolean fireOnce() {return false;}
 			public void action () {
-				test.rotate(-5);
+				test2.rotate(-5);
 			}
 		});
 		addKeyBinding(new KeyAction () {
 			public KeyCode getKey() {return KeyCode.E;}
 			public boolean fireOnce() {return false;}
 			public void action () {
-				test.rotate(5);
+				test2.rotate(5);
 			}
 		});
 		addKeyBinding(new KeyAction () {
 			public KeyCode getKey() {return KeyCode.R;}
 			public boolean fireOnce() {return false;}
 			public void action () {
-				test.rotateToNearest90Animation(1000, false, true);
+				test2.moveTo(0,0);
 			}
 		});
 		
@@ -77,22 +80,29 @@ public class Curveball extends GameRootPane {
 									  {1,0,0,0,1},
 									  {1,0,0,0,1}};
 									  		  
-		test = new PixelSprite (sprite,Color.BLUE,50,50);
-		test2 = new PixelSprite (sprite,Color.BLACK,50,50,"test2");
+		test = new PixelSprite (sprite,50,50,Color.BLUE);
+		test2 = new PixelSprite (sprite,50,50,"test2",Color.BLACK);
 		
-		test.translateAnimation(20, 100, 250, true, true);
+		//test.translateAnimation(20, 100, 250, true, true);
 		
-		this.addSprite(test, test2);
-		test2.moveTo(100, 100);
-		test2.translateAnimation(0, 100, 1000, true, false);
-		test2.rotateAnimation(360, 1000, true, false);
+		
+		this.addSprite(test,100,100);
+		this.addSprite(test2);
+		//test2.moveTo(100, 100);
+		//test2.translateAnimation(0, 100, 1000, true, false);
+		//test2.rotateAnimation(360, 1000, true, false);
+		
+		
+		
 	}
 	
 	public void update() {
+		/*
 		if (test.collided("test2")) {
 			System.out.println("collided");
 			this.removeSprite(test.getCollided("test2"));
 		}
+		*/
 	}
 	
 	public void onPause () {
