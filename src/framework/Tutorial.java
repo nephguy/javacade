@@ -1,6 +1,7 @@
 package framework;
 
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 import javafx.scene.control.Label;
 import javafx.geometry.Pos;
 import framework.Util;
@@ -17,7 +18,7 @@ public class Tutorial extends BorderPane{
 	
 	public Tutorial (GameRootPane parent, String tutorialText) {
 		parentGame = parent;
-		Label tutorial = Util.styleLabel(parentGame.getFont(), 10, false, tutorialText);
+		Label tutorial = Util.styleLabel(parentGame.getFont(), 10, Color.BLACK, Color.TRANSPARENT, false, true, tutorialText);
 		Label backToMenu = Util.styleLabel(parentGame.getFont(), 25, true, "Back to Game");
 		backToMenu.setOnMouseClicked(event -> {
 			returnToGame();

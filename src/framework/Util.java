@@ -26,12 +26,13 @@ import javafx.scene.image.ImageView;
 public class Util {
 	
 	public static Label styleLabel (String fontFileName, double fontSize, boolean clickable, String text) {
-		return styleLabel(fontFileName,fontSize,Color.BLACK,null,clickable,text);
+		return styleLabel(fontFileName,fontSize,Color.BLACK,null,clickable,false,text);
 	}
 	
-	public static Label styleLabel (String fontFileName, double fontSize, Paint fontColor, Color dropShadowColor, boolean clickable, String text) {
+	public static Label styleLabel (String fontFileName, double fontSize, Paint fontColor, Color dropShadowColor, boolean clickable, boolean wrap, String text) {
 		Label newLabel = new Label (text);
 		newLabel.setFont(Util.getFont(fontFileName, fontSize));
+		newLabel.setWrapText(wrap);
 		if (clickable) newLabel.setCursor(Cursor.HAND);
 		if (dropShadowColor != null) newLabel.setEffect(new DropShadow(BlurType.ONE_PASS_BOX,dropShadowColor,1,1,5,5));
 		newLabel.setTextFill(fontColor);

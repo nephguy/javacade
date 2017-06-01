@@ -36,7 +36,7 @@ public class MainMenu extends VBox{
 		setMinHeight(600);
 		setMinWidth(600);
 		
-		title = Util.styleLabel(font, 60, Color.BLACK, Color.DARKGRAY, false, "JAVACADE");
+		title = Util.styleLabel(font, 60, Color.BLACK, Color.DARKGRAY, false, false, "JAVACADE");
 		spacer = Util.styleLabel(font, 50, false, "");
 		games = Util.styleLabel(font, 25, true, "Games");
 		games.setOnMouseClicked(event -> {

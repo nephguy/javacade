@@ -62,8 +62,6 @@ public abstract class GameRootPane extends StackPane {
 	protected StackPane contentPane;
 	protected boolean paused;
 	PauseScreen pauseScreen;
-	public double scoreCounter;
-	protected Label score;
 	private double mouseX;
 	private double mouseY;
 	String font;
@@ -104,7 +102,7 @@ public abstract class GameRootPane extends StackPane {
 		setMinWidth(600);
 		setMaxHeight(600);
 		setBackground(Color.ALICEBLUE);
-		initMenu(60,25,backgroundMusicFileName);
+		initMenu(60,25,backgroundMusicFileName,"");
 		setBgMusic(menuMusicFileName, Util.clamp(musicVolume/100));
 		
 		// track mouse movement
@@ -146,10 +144,6 @@ public abstract class GameRootPane extends StackPane {
 		if (timer != null) timer.setText(newTime);
 	}
 	
-	private void updateScore () {
-		score.setText("Score: " + (int)scoreCounter);
-	}
-	
 	private void fireKeyAction (KeyCode key) {
 		keyBindings.forEach(k -> {
 			if (key == k.getKey()) {
@@ -180,11 +174,12 @@ public abstract class GameRootPane extends StackPane {
 	 * @param titleSize the font size of the game's title
 	 * @param menuElementSize the font size of all other menu elements on the main menu 
 	 * @param menuMusicFileName the file name, including file extension (.mp3, .wav, etc), of the game menu music
+	 * @param tutorialText the text for the "how to play" screen
 	 * @param bgFill the background of the main menu.
 	 * **/
-	protected void initMenu (double titleSize, double menuElementSize, String menuMusicFileName, Paint bgFill) { 
+	protected void initMenu (double titleSize, double menuElementSize, String menuMusicFileName, String tutorialText, Paint bgFill) { 
 		this.setBackground(bgFill);
-		this.initMenu(titleSize, menuElementSize, menuMusicFileName);
+		this.initMenu(titleSize, menuElementSize, menuMusicFileName, tutorialText);
 	}
 	
 	/**HIGHLY SUGGESTED to run this function in the game's constructor to create your game's main menu.
@@ -193,14 +188,15 @@ public abstract class GameRootPane extends StackPane {
 	 * @param titleSize the font size of the game's title
 	 * @param menuElementSize the font size of all other menu elements on the main menu 
 	 * @param menuMusicFileName the file name, including file extension (.mp3, .wav, etc), of the game menu music
+	 * @param tutorialText the text for the "how to play" screen
 	 * @param bgImage the background of the main menu
 	 * **/
-	protected void initMenu (double titleSize, double menuElementSize, String menuMusicFileName, ImageView bgImage) { 
+	protected void initMenu (double titleSize, double menuElementSize, String menuMusicFileName, String tutorialText, ImageView bgImage) { 
 		this.setBackground(bgImage);
-		this.initMenu(titleSize, menuElementSize, menuMusicFileName);
+		this.initMenu(titleSize, menuElementSize, menuMusicFileName, tutorialText);
 	}
 	
-	private void initMenu (double titleSize, double menuElementSize, String menuMusicFileName) {
+	private void initMenu (double titleSize, double menuElementSize, String menuMusicFileName, String tutorialText) {
 		this.menuMusicFileName = menuMusicFileName;
 		setBgMusic(menuMusicFileName, musicVolume);
 		VBox gameMenu = new VBox ();
@@ -220,7 +216,7 @@ public abstract class GameRootPane extends StackPane {
 		
 		tutorial = Util.styleLabel(font, menuElementSize, true, "How To Play");
 		tutorial.setOnMouseClicked(event -> {
-			this.addPane(new Tutorial(this,""));
+			this.addPane(new Tutorial(this,tutorialText));
 		});
 		
 		backToMenu = Util.styleLabel(font, menuElementSize, true, "Exit Game");
@@ -241,24 +237,19 @@ public abstract class GameRootPane extends StackPane {
 		this.addPane(gameMenu);
 	}
 	
+	protected void enableTimer (double fontSize, Pos position) {
+		this.enableTimer(fontSize, Color.BLACK, Color.TRANSPARENT, position);
+	}
+	
 	/**Makes the timer Label functional. Run this if you want a timer in your game, before you place it in the scene.**/
-	protected void enableTimer (double fontSize, boolean enableDropShadow, Pos position) {
-		if (enableDropShadow) timer = Util.styleLabel(font, fontSize, Color.BLACK, Color.DARKGRAY, false, "");
-		else timer = Util.styleLabel(font, fontSize, false, "");
+	protected void enableTimer (double fontSize, Paint fontColor, Color dropShadowColor, Pos position) {
+		timer = Util.styleLabel(font, fontSize, fontColor, dropShadowColor, false, true, "");
 		timer.setPadding(new Insets(20));
 		timer.setAlignment(position);
 		addPane(timer);
 		updateTimer();
 	}
 	
-	protected void enableScore (double fontSize, boolean enableDropShadow, Pos position) {
-		if (enableDropShadow) score = Util.styleLabel(font, fontSize, Color.BLACK, Color.DARKGRAY, false, "");
-		else score = Util.styleLabel(font, fontSize, false, "");
-		score.setPadding(new Insets(20));
-		score.setAlignment(position);
-		addPane(score);
-		updateScore();
-	}
 	
 	/**Stops previously playing background music, initializes new background music, and begins playing it.
 	 * <p>
@@ -413,20 +404,7 @@ public abstract class GameRootPane extends StackPane {
 		return mouseY;
 	}
 	
-	/**Adds the double passed to the score and updates the score counter.**/
-	protected void addToScore (double score) {
-		scoreCounter += score;
-		updateScore();
-	}
-	/**Removes the double passed in from the score and updates the score counter.**/
-	protected void removeFromScore (double score) {
-		scoreCounter -= score;
-		updateScore();
-	}
-	/**Returns a double equal to the score.**/
-	protected double getScore () {
-		return scoreCounter;
-	}
+	
 	
 	/**DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING.
 	 * Adds a pane to the game, above all other panes, including the timer and score counter.**/

@@ -14,9 +14,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.animation.Animation.Status;
-import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
-import javafx.scene.Node;
 
 /**
  * @author Nick Hansen
@@ -40,8 +38,11 @@ public class PixelSprite extends Sprite {
 	ArrayList<Rectangle> pixels;
 	
 	/**Creates a pixelated sprite.
-	 * An array of integers is passed in to define which pixels to draw.
+	 * A 2-D array of integers is passed in to define which pixels to draw.
 	 * For each element of the array, if it is equal to anything except 0, a pixel will be drawn there.
+	 * Sprites can be more than one color. Each number in the int array specifies a unique color.
+	 * The integers in the array must count up from 0, and 
+	 * the number of colors passed in must be equal to the highest number in the int array.
 	 * <p>
 	 * For example, 
 	 * <pre><code> int[][] tSprite = new int[][] {{1,1,1,1,1},
@@ -50,26 +51,26 @@ public class PixelSprite extends Sprite {
 	 * 				{0,0,1,0,0},
 	 * 				{0,0,1,0,0}};
 	 * </code></pre>
-	 * would create a T-shaped sprite.
+	 * would create a monochrome T-shaped sprite.
 	 * <p>
 	 * The sprite does not have to be continuous, i.e. the individual pixels do not need to be connected, so.
 	 * 
 	 * <pre><code> int[][] iSprite = new int[][] {{0,0,1,0,0},
 	 * 				{0,0,0,0,0},
-	 * 				{0,0,1,0,0},
-	 * 				{0,0,1,0,0},
-	 * 				{0,0,1,0,0}};
+	 * 				{0,0,2,0,0},
+	 * 				{0,0,2,0,0},
+	 * 				{0,0,2,0,0}};
 	 * </code></pre>
-	 * would be valid, and create an i-shaped sprite.
-	 * <p>
+	 * would be valid, and create a multi-colored, i-shaped sprite.
+	 * <p> 
 	 * Despite whatever pixels you specify, the sprite will always have the height <code>realHeight</code> and the width <code>realWidth</code>.
 	 * If this sprite is one of a family of sprites, set the id equal to the family’s id, to allow for checking collision with all of them simultaneously.
 	 * 
 	 * @param pixels an integer array to define the sprite
-	 * @param fill the color of the sprite
 	 * @param realHeight height of the entire sprite, NOT each pixel
 	 * @param realWidth width of the entire sprite, NOT each pixel
 	 * @param id id of this sprite, used in checking collisions
+	 * @param fills the colors of the sprite.
 	 * **/
 	public PixelSprite (int[][] pixels, double realHeight, double realWidth, String id, Paint... fills) {
 		double pHeight = realHeight / pixels.length;
@@ -329,6 +330,7 @@ public class PixelSprite extends Sprite {
 	}
 	
 /****************************************************************************************************/
+	
 	/**Master pause function. Pauses all currently running animations on the sprite**/
 	public void pause () {
 		if (scale.getStatus() == Status.RUNNING) scale.pause();
@@ -341,58 +343,6 @@ public class PixelSprite extends Sprite {
 		if (scale.getStatus() == Status.PAUSED) scale.play();
 		if (translate.getStatus() == Status.PAUSED) translate.play();
 		if (rotate.getStatus() == Status.PAUSED) rotate.play();
-	}
+	}	
 	
-/****************************************************************************************************/	
-	
-	/**Returns a boolean representing if this sprite has collided with the ONE other sprite specified**/
-	public boolean collided (Node other) {
-		return this.getBoundsInParent().intersects(other.getBoundsInParent());
-	}
-	
-	/**Returns a boolean representing if this sprite has collided with ANY other sprite with the specified id.
-	 * Used to check for collisions with a family of nodes
-	 * @param id the id of the group of nodes for which to check collision
-	 * **/
-	public boolean collided (String id) {
-		ObservableList<Node> children = this.getParent().getChildrenUnmodifiable();
-		for (int i = 0; i < children.size(); i++) {
-			try {
-				if (this.collided(children.get(i)) && children.get(i).getId().equals(id)) return true;
-			} catch (NullPointerException e) {} // is thrown if the node has no id. this then skips that node.
-		}
-		return false;
-	}
-	
-	/**Returns the node with the given id that this sprite has collided with.
-	 * If it has not collided with any node with the specified id, this will return null.
-	 * <p>
-	 * If you want to delete nodes on collision, use this function to get the node, then run 
-	 * <pre><code>
-	 * removePane(Node other);
-	 * </pre></code>
-	 * in your game's update() function.
-	 * @param id the id for the group of nodes for which to check collision
-	 * **/
-	public Node getCollided (String id) {
-		ObservableList<Node> children = this.getParent().getChildrenUnmodifiable();
-		for (int i = 0; i < children.size(); i++) {
-			try {
-				if (this.collided(children.get(i)) && children.get(i).getId().equals(id)) return children.get(i);
-			} catch (NullPointerException e) {} // is thrown if the node has no id. this then skips that node.
-		}
-		return null;
-	}
-	
-/****************************************************************************************************/
-	
-	/**Set if the sprite is to be prevented from moving outside of the scene or not.**/
-	public void setConstrainToScene (boolean bool) {
-		constrainToScene = bool;
-	}
-	
-	/**Returns a boolean representing if the sprite is to be prevented from moving outside of the scene or not.**/
-	public boolean getConstrainToScene () {
-		return constrainToScene;
-	}
 }
