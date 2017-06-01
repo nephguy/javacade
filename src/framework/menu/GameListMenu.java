@@ -9,9 +9,14 @@ import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.image.ImageView;
 
-import curveball.Curveball;
 import framework.GameRootPane;
 import framework.Util;
+
+/**IMPORT GAMES HERE**/
+
+import curveball.Curveball;
+
+/**IMPORT GAMES HERE**/
 
 /**
  * @author Nick Hansen
