@@ -71,17 +71,17 @@ public abstract class GameRootPane extends StackPane {
 	protected MediaPlayer bgMusic;
 	
 	// variables to make the pause screen and main menu work properly
-	String gameTitle;
+	public String gameTitle;
 	String menuMusicFileName;
 	String backgroundMusicFileName;
 	double musicVolume;
 	Background currentBackground;
 	
-	public GameRootPane (String gamePackageName, String gameTitle, String backgroundMusicFileName) {
-		this(gamePackageName,gameTitle,"press-start.ttf",backgroundMusicFileName,50,60);
+	public GameRootPane (String gameTitle, String backgroundMusicFileName) {
+		this(gameTitle,"press-start.ttf",backgroundMusicFileName,50,60);
 	}
 	
-	public GameRootPane (String gamePackageName, String gameTitle, String localFont, String backgroundMusicFileName, double musicVolume, double fps) {
+	public GameRootPane (String gameTitle, String localFont, String backgroundMusicFileName, double musicVolume, double fps) {
 		// create and add content pane
 		contentPane = new StackPane();
 		this.getChildren().add(contentPane);
@@ -92,7 +92,8 @@ public abstract class GameRootPane extends StackPane {
 		this.gameTitle = gameTitle;
 		this.backgroundMusicFileName = backgroundMusicFileName; 
 		this.musicVolume = Util.clamp(musicVolume/100);
-		this.packageName = gamePackageName;
+		this.packageName = this.getClass().getPackage().getName();
+		
 		
 		// initialize misc. settings
 		paused = false;
@@ -112,7 +113,7 @@ public abstract class GameRootPane extends StackPane {
 			mouseY = event.getY();
 		});
 		
-		// game loop. runs every frame. game runs at 60fps.
+		// game loop. runs every frame
 		gameUpdate = event -> {
 			timeElapsedInMs += gameLoop.getCurrentTime().toMillis();
 			timeElapsedInS += gameLoop.getCurrentTime().toSeconds();
@@ -275,8 +276,8 @@ public abstract class GameRootPane extends StackPane {
 	 * <p>
 	 * @param volume MUST be between 0.0 and 100.0
 	 * @param musicFileName the exact file name, including type extension (.mp3, .wav, etc)**/
-	public static void playSfx (String gamePackageName, String sfxFileName, double volume) {
-		MediaPlayer sfx = new MediaPlayer(Util.getSfx(gamePackageName, sfxFileName));
+	protected void playSfx (String sfxFileName, double volume) {
+		MediaPlayer sfx = new MediaPlayer(Util.getSfx(packageName, sfxFileName));
 		sfx.setVolume(volume/100);
 		sfx.play();
 	}

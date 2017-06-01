@@ -14,7 +14,7 @@ public class Curveball extends GameRootPane {
 	PixelSprite test2;
 	
 	public Curveball () {
-		super("curveball", "Curveball", "TroyBoi - On My Own.mp3");
+		super("Curveball","TroyBoi - On My Own.mp3");
 		
 		addKeyBinding(new KeyAction () {
 			public KeyCode getKey() {return KeyCode.W;}
