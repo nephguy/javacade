@@ -23,34 +23,25 @@ public class GameListMenu extends Menu {
 	
 	TilePane games;
 	
-	Curveball curveball = new Curveball ();
-	
 	public GameListMenu () {
 		
 		games = new TilePane();
 		games.setOrientation(Orientation.HORIZONTAL);
 		games.setAlignment(Pos.TOP_LEFT);
-		
-		addGame (curveball,"curveball","Curveball");
-		addGame (curveball,"curveball","Curveball");
-		addGame (curveball,"curveball","Curveball");
-		addGame (curveball,"curveball","Curveball");
-		addGame (curveball,"curveball","Curveball");
-		
-		
-		
-		
-		
 		this.setCenter(games);
-		this.setPadding(new Insets (20));
-		this.setMinHeight(600);
-		this.setMinWidth(600);
+		
+		/**ADD YOUR GAME HERE**/
+		addGame (new Curveball());
+		
+		
+		
+		/**ADD YOUR GAME HERE**/
 	}
 	
-	private void addGame (GameRootPane game, String gamePackageName, String name) {
+	private void addGame (GameRootPane game) {
 		VBox gameButton = new VBox ();
-		Label gameName = Util.styleLabel(font, 10, false, name);
-		ImageView gameImage = Util.getImage(gamePackageName, "previewimg.png");
+		Label gameName = Util.styleLabel(font, 10, false, game.gameTitle);
+		ImageView gameImage = Util.getImage(game.getClass().getPackage().getName(), "previewimg.png");
 		gameImage.setFitHeight(120);
 		gameImage.setFitWidth(120);
 		
