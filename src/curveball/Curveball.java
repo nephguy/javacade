@@ -3,6 +3,7 @@ package curveball;
 import framework.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
+import javafx.geometry.Pos;
 
 /**
  * @author Nick Hansen
@@ -97,12 +98,7 @@ public class Curveball extends GameRootPane {
 	}
 	
 	public void update() {
-		/*
-		if (test.collided("test2")) {
-			System.out.println("collided");
-			this.removeSprite(test.getCollided("test2"));
-		}
-		*/
+		
 	}
 	
 	public void onPause () {

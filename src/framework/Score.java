@@ -16,7 +16,7 @@ public class Score extends Label{
 
 	private double score;
 	private double scoreBeforeDisabled;
-	private boolean disabled = false;
+	private boolean disabled;
 	
 	/** A simpler constructor. Same as the other, but with the colors set to default values
 	 *  <pre><code>
@@ -48,6 +48,7 @@ public class Score extends Label{
 		this.setPadding(new Insets(20));
 		this.setAlignment(position);
 		updateScore();
+		disabled = false;
 		parent.addPane(this);
 	}
 	
