@@ -51,7 +51,7 @@ public class PixelSprite extends Sprite {
 	 * @param realWidth width of the entire sprite, NOT each pixel
 	 * @param id id of this sprite, used in checking collisions
 	 * @param fills the colors of the sprite.
-	 * **/
+	 */
 	public PixelSprite (int[][] pixels, double realHeight, double realWidth, String id , Paint... fills) {
 		super(realHeight,realWidth);
 		double pHeight = realHeight / pixels.length;
@@ -84,8 +84,16 @@ public class PixelSprite extends Sprite {
 	
 	/**SEE OTHER CONSTRUCTOR FOR DETAILED EXPLANATION OF THIS CLASS
 	 * <p>
+	 * Constructs a pixel sprite based on the individual pixels' dimentions, instead of the entire sprite's dimentions.
+	 */
+	public PixelSprite (int[][] pixels, String id, double pixelHeight, double pixelWidth, Paint... fills) {
+		this(pixels,pixelHeight*pixels.length,pixelWidth*pixels[0].length,id,fills);
+	}
+	
+	/**SEE OTHER CONSTRUCTOR FOR DETAILED EXPLANATION OF THIS CLASS
+	 * <p>
 	 * Creates a pixel sprite without an id.
-	 * **/
+	 */
 	public PixelSprite (int[][] pixels, double realHeight, double realWidth, Paint... fills) {
 		this(pixels,realHeight,realWidth,"",fills);
 	}
