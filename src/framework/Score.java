@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
 import javafx.scene.paint.Color;
 
@@ -46,10 +47,10 @@ public class Score extends Label{
 		setEffect(new DropShadow(BlurType.ONE_PASS_BOX,dropShadowColor,1,1,5,5));
 		setTextFill(fontColor);
 		this.setPadding(new Insets(20));
-		this.setAlignment(position);
+		StackPane.setAlignment(this, position);
 		updateScore();
 		disabled = false;
-		parent.addPane(this);
+		parent.addPaneAbove(this);
 	}
 	
 	/**Temporarily disables the score counter after it has been enabled*/

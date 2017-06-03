@@ -61,9 +61,11 @@ public class Curveball extends GameRootPane {
 		
 		ball.scaleAnimation(0.5, 1000, true, true);
 		
-		this.addSprite(enemyPaddle,100,100);
-		this.addSprite(ball,100,100);
+		this.addSprite(enemyPaddle);
+		this.addSprite(ball);
 		this.addSprite(playerPaddle,200,200);
+		
+		this.enableTimer(20, Color.GRAY, Color.LIGHTGRAY, Pos.TOP_CENTER);
 		
 	}
 	

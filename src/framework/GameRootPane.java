@@ -216,7 +216,7 @@ public abstract class GameRootPane extends StackPane {
 		
 		tutorial = Util.styleLabel(font, menuElementSize, true, "How To Play");
 		tutorial.setOnMouseClicked(event -> {
-			this.addPane(new Tutorial(this,tutorialText));
+			this.addPaneAbove(new Tutorial(this,tutorialText));
 		});
 		
 		backToMenu = Util.styleLabel(font, menuElementSize, true, "Exit Game");
@@ -234,7 +234,7 @@ public abstract class GameRootPane extends StackPane {
 		gameMenu.setSpacing(20);
 		gameMenu.setBackground(this.getBackground());
 		
-		this.addPane(gameMenu);
+		this.addPaneAbove(gameMenu);
 	}
 	
 	protected void enableTimer (double fontSize, Pos position) {
@@ -245,8 +245,8 @@ public abstract class GameRootPane extends StackPane {
 	protected void enableTimer (double fontSize, Paint fontColor, Color dropShadowColor, Pos position) {
 		timer = Util.styleLabel(font, fontSize, fontColor, dropShadowColor, false, true, "");
 		timer.setPadding(new Insets(20));
-		timer.setAlignment(position);
-		addPane(timer);
+		addPaneAbove(timer);
+		StackPane.setAlignment(timer, position);
 		updateTimer();
 	}
 	
@@ -286,7 +286,7 @@ public abstract class GameRootPane extends StackPane {
 			}
 			
 			// normal pause actions
-			addPane(pauseScreen);
+			addPaneAbove(pauseScreen);
 			paused = true;
 			onPause();
 			bgMusic.pause();
@@ -406,7 +406,10 @@ public abstract class GameRootPane extends StackPane {
 	
 	/**DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING.
 	 * Adds a pane to the game, above all other panes, including the timer and score counter.**/
-	public void addPane (Node node) {
+	public void addPaneBelow (Node node) {
+		this.getChildren().add(0,node);
+	}
+	public void addPaneAbove (Node node) {
 		this.getChildren().add(node);
 	}
 	/**Removes a pane from the scene.**/
@@ -420,7 +423,6 @@ public abstract class GameRootPane extends StackPane {
 	}
 	public void addSprite (Sprite sprite) {
 		spritePane.getChildren().add(sprite);
-		sprite.moveTo(0, 0);
 	}
 	public void addSprite (Sprite... sprites) {
 		spritePane.getChildren().addAll(sprites);

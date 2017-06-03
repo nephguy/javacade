@@ -34,7 +34,7 @@ public class Util {
 		newLabel.setFont(Util.getFont(fontFileName, fontSize));
 		newLabel.setWrapText(wrap);
 		if (clickable) newLabel.setCursor(Cursor.HAND);
-		if (dropShadowColor != null) newLabel.setEffect(new DropShadow(BlurType.ONE_PASS_BOX,dropShadowColor,1,1,5,5));
+		if (dropShadowColor != null) newLabel.setEffect(new DropShadow(BlurType.ONE_PASS_BOX,dropShadowColor,1,1,fontSize/8,fontSize/8));
 		newLabel.setTextFill(fontColor);
 		return newLabel;
 	}
