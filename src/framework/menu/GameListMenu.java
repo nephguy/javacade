@@ -5,6 +5,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.image.ImageView;
@@ -28,7 +29,8 @@ public class GameListMenu extends Menu {
 	
 	TilePane games;
 	
-	public GameListMenu () {
+	public GameListMenu (StackPane parent) {
+		super(parent);
 		
 		games = new TilePane();
 		games.setOrientation(Orientation.HORIZONTAL);

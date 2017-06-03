@@ -18,7 +18,9 @@ public class Curveball extends GameRootPane {
 	PixelSprite ball;
 	
 	public Curveball () {
-		super("Curveball","TroyBoi - On My Own.mp3");
+		super("CURVEBALL","TroyBoi - On My Own.mp3");
+		
+		initMenu(60, 20, Color.LIGHTSKYBLUE, Util.radialGradient(0.5, 0.5, Color.DARKSLATEGRAY, Color.BLACK), "", "");
 		
 		addKeyBinding(new KeyAction () {
 			public KeyCode getKey() {return KeyCode.W;}
@@ -53,8 +55,8 @@ public class Curveball extends GameRootPane {
 
 	public void onGameStart() {
 		this.setCursor(Cursor.NONE);
-		int[][] paddleArray = Sprite.spriteFromFile(this,"paddle.txt",29,45);
-		int[][] ballArray = Sprite.spriteFromFile(this, "ball.txt", 16, 16);
+		int[][] paddleArray = PixelSprite.spriteFromFile(this,"paddle.txt",29,45);
+		int[][] ballArray = PixelSprite.spriteFromFile(this, "ball.txt", 16, 16);
 		enemyPaddle = new PixelSprite(paddleArray,29*2.25,45*2.25,"paddle",Color.RED,Paint.valueOf("#FF450080"),Color.RED);
 		ball = new PixelSprite(ballArray,16*4.5,16*4.5,"ball",Color.DARKORANGE,Color.ORANGE,Color.GOLD);
 		playerPaddle = new PixelSprite(paddleArray,29*4.5,45*4.5,"paddle",Color.BLUE,Paint.valueOf("#ADD8E680"),Color.BLUE);

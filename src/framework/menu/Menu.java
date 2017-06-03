@@ -1,6 +1,11 @@
 package framework.menu;
 
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.control.Label;
 import javafx.geometry.Pos;
 import framework.MainMenu;
@@ -15,8 +20,14 @@ import javafx.geometry.Insets;
 public class Menu extends BorderPane{
 
 	String font = "press-start.ttf";
+	StackPane parent;
 	
-	public Menu () {
+	public Menu (StackPane parent) {
+		this.parent = parent;
+		this.setBackground(new Background(new BackgroundFill(
+				Color.LIGHTGRAY,
+				CornerRadii.EMPTY,
+				Insets.EMPTY)));
 		
 		Label backToMenu = Util.styleLabel(font, 25, true, "Back to Main Menu");
 		backToMenu.setOnMouseClicked(event -> {
@@ -37,7 +48,7 @@ public class Menu extends BorderPane{
 	}
 	
 	private void returnToMainMenu () {
-		this.getScene().setRoot(new MainMenu());
+		parent.getChildren().remove(this);
 	}
 	
 	private void arm () {

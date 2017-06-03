@@ -9,11 +9,13 @@ import javafx.scene.Scene;
  */
 
 public class Main extends Application {
-
+	
 	MainMenu mainMenu;
+	public static String appDataPath;
 	
 	public void init () {
-		mainMenu = new MainMenu ();
+		mainMenu = new MainMenu();
+		appDataPath = mainMenu.appDataPath;
 	}
 	
 	public void start (Stage stage) {

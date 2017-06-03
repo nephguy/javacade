@@ -19,7 +19,7 @@ public class SpaceInvaders extends GameRootPane {
 		
 		String tutorialText = "test"+
 							  "test2";
-		initMenu(50,30,"SpaceInvadersTheme.mp3","Kill the aliens",Color.WHITE);
+		initMenu(50,30,Color.WHITE, Color.BLACK, "SpaceInvadersTheme.mp3","Kill the aliens");
 		
 		addKeyBinding(new KeyAction () {
 			public KeyCode getKey() {return KeyCode.W;}

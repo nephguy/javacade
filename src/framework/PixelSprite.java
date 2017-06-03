@@ -1,5 +1,9 @@
 package framework;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javafx.scene.shape.Path;
@@ -101,5 +105,30 @@ public class PixelSprite extends Sprite {
 	 */
 	public PixelSprite (int[][] pixels, double realHeight, double realWidth, Paint... fills) {
 		this(pixels,realHeight,realWidth,"",fills);
+	}
+	
+	public static int[][] spriteFromFile (GameRootPane calledFrom, String spriteFileName, int heightInPixels, int widthInPixels) {
+		int[][] vals = new int[heightInPixels][widthInPixels];
+		String line;
+		int row = 0;
+		
+		// extracts integers from the file.
+		// gets the line, then iterates along it, adding the parsed ints to the 2d int array;
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(
+					"src/" + calledFrom.getClass().getPackage().getName() + "/sprite/" + spriteFileName));
+			while ((line = reader.readLine()) != null) {
+				final String[] lineArray = line.trim().split(",");
+				for (int col = 0; col < widthInPixels; col++) {
+					vals[row][col] = Integer.parseInt(lineArray[col]);
+				}
+				row++;
+			}
+			reader.close();
+			return vals;
+		}
+		catch (FileNotFoundException e) {e.printStackTrace();}
+		catch (IOException e) {e.printStackTrace();}
+		return null;
 	}
 }

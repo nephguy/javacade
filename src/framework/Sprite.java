@@ -45,31 +45,6 @@ public abstract class Sprite extends StackPane{
 		constrainToScene = true;
 	}
 	
-	public static int[][] spriteFromFile (GameRootPane calledFrom, String spriteFileName, int heightInPixels, int widthInPixels) {
-		int[][] vals = new int[heightInPixels][widthInPixels];
-		String line;
-		int row = 0;
-		
-		// extracts integers from the file.
-		// gets the line, then iterates along it, adding the parsed ints to the 2d int array;
-		try {
-			BufferedReader reader = new BufferedReader(new FileReader(
-					"src/" + calledFrom.getClass().getPackage().getName() + "/sprite/" + spriteFileName));
-			while ((line = reader.readLine()) != null) {
-				final String[] lineArray = line.trim().split(",");
-				for (int col = 0; col < widthInPixels; col++) {
-					vals[row][col] = Integer.parseInt(lineArray[col]);
-				}
-				row++;
-			}
-			reader.close();
-			return vals;
-		}
-		catch (FileNotFoundException e) {e.printStackTrace();}
-		catch (IOException e) {e.printStackTrace();}
-		return null;
-	}
-	
 /****************************************************************************************************/
 	
 	/**Immediately scales the sprite by a specified factor.

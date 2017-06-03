@@ -70,9 +70,8 @@ public abstract class GameRootPane extends StackPane {
 	
 	// variables to make the pause screen and main menu work properly
 	public String gameTitle;
-	String menuMusicFileName;
-	String backgroundMusicFileName;
-	double musicVolume;
+	protected String backgroundMusicFileName;
+	protected double musicVolume;
 	Background currentBackground;
 	
 	public GameRootPane (String gameTitle, String backgroundMusicFileName) {
@@ -82,14 +81,14 @@ public abstract class GameRootPane extends StackPane {
 	public GameRootPane (String gameTitle, String localFont, String backgroundMusicFileName, double musicVolume, double fps) {
 		// create and add content pane
 		spritePane = new StackPane();
-		this.getChildren().add(spritePane);
+		addPaneAbove(spritePane);
 		
 		// initialize object variables
 		if (localFont.equalsIgnoreCase("default") || localFont.equals(null) || localFont.equals("")) font = "press-start.ttf";
 		else font = localFont;
 		this.gameTitle = gameTitle;
 		this.backgroundMusicFileName = backgroundMusicFileName; 
-		this.musicVolume = Util.clamp(musicVolume/100);
+		this.musicVolume = Util.clamp(musicVolume/100)*100;
 		this.packageName = this.getClass().getPackage().getName();
 		
 		
@@ -102,8 +101,6 @@ public abstract class GameRootPane extends StackPane {
 		setMinWidth(600);
 		setMaxHeight(600);
 		setBackground(Color.ALICEBLUE);
-		initMenu(60,25,backgroundMusicFileName,"");
-		setBgMusic(menuMusicFileName, Util.clamp(musicVolume/100));
 		
 		// track mouse movement
 		this.setOnMouseMoved(event -> {
@@ -177,9 +174,9 @@ public abstract class GameRootPane extends StackPane {
 	 * @param tutorialText the text for the "how to play" screen
 	 * @param bgFill the background of the main menu.
 	 * **/
-	protected void initMenu (double titleSize, double menuElementSize, String menuMusicFileName, String tutorialText, Paint bgFill) { 
+	protected void initMenu (double titleSize, double menuElementSize, Paint textColor, Paint bgFill, String menuMusicFileName, String tutorialText) { 
 		this.setBackground(bgFill);
-		this.initMenu(titleSize, menuElementSize, menuMusicFileName, tutorialText);
+		this.initMenu(titleSize, menuElementSize, textColor, menuMusicFileName, tutorialText);
 	}
 	
 	/**HIGHLY SUGGESTED to run this function in the game's constructor to create your game's main menu.
@@ -191,21 +188,20 @@ public abstract class GameRootPane extends StackPane {
 	 * @param tutorialText the text for the "how to play" screen
 	 * @param bgImage the background of the main menu
 	 * **/
-	protected void initMenu (double titleSize, double menuElementSize, String menuMusicFileName, String tutorialText, ImageView bgImage) { 
+	protected void initMenu (double titleSize, double menuElementSize, Paint textColor, String menuMusicFileName, ImageView bgImage, String tutorialText) { 
 		this.setBackground(bgImage);
-		this.initMenu(titleSize, menuElementSize, menuMusicFileName, tutorialText);
+		this.initMenu(titleSize, menuElementSize, textColor, menuMusicFileName, tutorialText);
 	}
 	
-	private void initMenu (double titleSize, double menuElementSize, String menuMusicFileName, String tutorialText) {
-		this.menuMusicFileName = menuMusicFileName;
-		setBgMusic(menuMusicFileName, musicVolume);
+	private void initMenu (double titleSize, double menuElementSize, Paint textColor, String menuMusicFileName, String tutorialText) {
+		if (!(menuMusicFileName.equals(null) || menuMusicFileName.equals(""))) setBgMusic(menuMusicFileName, musicVolume);
 		VBox gameMenu = new VBox ();
 		
-		title = Util.styleLabel(font, titleSize, false, gameTitle);
+		title = Util.styleLabel(font, titleSize, textColor, Color.TRANSPARENT, false, true, gameTitle);
 		
 		Label spacer = Util.styleLabel(font, titleSize-10, false, "");
 		
-		play = Util.styleLabel(font, menuElementSize, true, "Play Game");
+		play = Util.styleLabel(font, menuElementSize, textColor, Color.TRANSPARENT, true, true, "Play Game");
 		play.setOnMouseClicked(event -> {
 			setBgMusic(backgroundMusicFileName, musicVolume);
 			this.removePane(gameMenu);
@@ -214,12 +210,12 @@ public abstract class GameRootPane extends StackPane {
 			onGameStart();
 		});
 		
-		tutorial = Util.styleLabel(font, menuElementSize, true, "How To Play");
+		tutorial = Util.styleLabel(font, menuElementSize, textColor, Color.TRANSPARENT, true, true, "How To Play");
 		tutorial.setOnMouseClicked(event -> {
 			this.addPaneAbove(new Tutorial(this,tutorialText));
 		});
 		
-		backToMenu = Util.styleLabel(font, menuElementSize, true, "Exit Game");
+		backToMenu = Util.styleLabel(font, menuElementSize, textColor, Color.TRANSPARENT, true, true, "Exit Game");
 		backToMenu.setOnMouseClicked(event -> {
 			disarm();
 			this.getScene().setRoot(new MainMenu());
@@ -367,7 +363,6 @@ public abstract class GameRootPane extends StackPane {
 			keysPressed.remove(key);
 			if (keysFiredOnce.contains(key)) keysFiredOnce.remove(key);
 		});
-		bgMusic.play();
 	}
 	/**Called upon closing the game. Ensures the game loops exits safely, and any game-specific settings are reset.
 	 * This prevents settings leaking from one game to another, and readies it for the game's next launch.**/

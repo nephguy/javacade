@@ -3,6 +3,7 @@ package framework.menu;
 import framework.Util;
 
 import javafx.geometry.Pos;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 /**
@@ -16,8 +17,8 @@ public class CreditsMenu extends Menu{
 	VBox titles;
 	VBox authors;
 	
-	public CreditsMenu () {
-		super();
+	public CreditsMenu (StackPane parent) {
+		super(parent);
 		
 		titles = new VBox();
 		authors = new VBox();
