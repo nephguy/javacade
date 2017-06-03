@@ -59,7 +59,7 @@ public abstract class GameRootPane extends StackPane {
 	protected Label backToMenu;
 	
 	// general variables
-	protected StackPane contentPane;
+	protected StackPane spritePane;
 	protected boolean paused;
 	PauseScreen pauseScreen;
 	private double mouseX;
@@ -81,8 +81,8 @@ public abstract class GameRootPane extends StackPane {
 	
 	public GameRootPane (String gameTitle, String localFont, String backgroundMusicFileName, double musicVolume, double fps) {
 		// create and add content pane
-		contentPane = new StackPane();
-		this.getChildren().add(contentPane);
+		spritePane = new StackPane();
+		this.getChildren().add(spritePane);
 		
 		// initialize object variables
 		if (localFont.equalsIgnoreCase("default") || localFont.equals(null) || localFont.equals("")) font = "press-start.ttf";
@@ -275,14 +275,13 @@ public abstract class GameRootPane extends StackPane {
 	
 	/**Pauses/unpauses the game and manages the pause screen**/
 	protected void togglePause() {
-		PixelSprite p;
+		Sprite s;
 		if (!paused) {
 			// automatically pauses currently running animated sprites
-			for (int i = 0; i < this.getChildren().size(); i++) {
-				if (this.getChildren().get(i) instanceof PixelSprite) {
-					p = (PixelSprite)this.getChildren().get(i);
-					p.pause();
-					this.getChildren().set(i, p);
+			for (int i = 0; i < this.spritePane.getChildren().size(); i++) {
+				if (this.spritePane.getChildren().get(i) instanceof Sprite) {
+					s = (Sprite)this.spritePane.getChildren().get(i);
+					s.pause();
 				}
 			}
 			
@@ -295,11 +294,10 @@ public abstract class GameRootPane extends StackPane {
 		}
 		else {
 			// automatically resumes currently paused animated sprites
-			for (int i = 0; i < this.getChildren().size(); i++) {
-				if (this.getChildren().get(i) instanceof PixelSprite) {
-					p = (PixelSprite)this.getChildren().get(i);
-					p.resume();
-					this.getChildren().set(i, p);
+			for (int i = 0; i < this.spritePane.getChildren().size(); i++) {
+				if (this.spritePane.getChildren().get(i) instanceof Sprite) {
+					s = (Sprite)this.spritePane.getChildren().get(i);
+					s.resume();
 				}
 			}
 			
@@ -417,20 +415,20 @@ public abstract class GameRootPane extends StackPane {
 	}
 	
 	public void addSprite (Sprite sprite, double x, double y) {
-		contentPane.getChildren().add(sprite);
+		spritePane.getChildren().add(sprite);
 		sprite.moveTo(x, y);
 	}
 	public void addSprite (Sprite sprite) {
-		contentPane.getChildren().add(sprite);
+		spritePane.getChildren().add(sprite);
 		sprite.moveTo(0, 0);
 	}
 	public void addSprite (Sprite... sprites) {
-		contentPane.getChildren().addAll(sprites);
+		spritePane.getChildren().addAll(sprites);
 		for (int i = 0; i < sprites.length; i++) {
 			sprites[i].moveTo(1, 1);
 		}
 	}
 	public void removeSprite (Sprite sprite) {
-		contentPane.getChildren().remove(sprite);
+		spritePane.getChildren().remove(sprite);
 	}
 }

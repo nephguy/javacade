@@ -34,14 +34,14 @@ public abstract class Sprite extends StackPane{
 	private boolean interruptRotate = false;
 	
 	// used for moveTo();
-	private double height;
-	private double width;
+	//private double height;
+	//private double width;
 	
 	public Sprite (double height, double width) {
 		setMaxSize(width, height);
 		setMinSize(width, height);
-		this.height = height;
-		this.width = width;
+		//this.height = height;
+		//this.width = width;
 		constrainToScene = true;
 	}
 	
@@ -148,7 +148,7 @@ public abstract class Sprite extends StackPane{
 	
 /****************************************************************************************************/
 	
-	/**Immediately moves the sprite's top left corner to the specified coordinates.
+	/**Immediately moves the sprite's center to the specified coordinates.
 	 * Interrupts any current translation animation if allowed to.
 	 * <p>
 	 * It is recommended to use this function ONLY to initialize a sprite's position.
@@ -159,11 +159,11 @@ public abstract class Sprite extends StackPane{
 		if (interruptTranslate && translate.getCurrentRate() != 0) translate.stop();
 		double maxX = this.getParent().getScene().getWidth();
 		double maxY = this.getParent().getScene().getHeight();
-		this.setTranslateX(Util.clamp(x/maxX)*maxX - maxX/2 + width/2);
-		this.setTranslateY(Util.clamp(y/maxY)*maxY - maxY/2 + height/2);
+		this.setTranslateX(Util.clamp(x/maxX)*maxX - maxX/2);
+		this.setTranslateY(Util.clamp(y/maxY)*maxY - maxY/2);
 	}
 	
-	/**Smoothly moves the sprite's top left corner from its current coordinates to the specified coordinates over a period of time. 
+	/**Smoothly moves the sprite's center from its current coordinates to the specified coordinates over a period of time. 
 	 * @param x the x-coordinate to which the sprite is to be moved
 	 * @param y the y-coordinate to which the sprite is to be moved
 	 * @param timeInMs set the length of one cycle (initial -> specified coordinates)
@@ -176,8 +176,8 @@ public abstract class Sprite extends StackPane{
 		translate = new Timeline ();
 		double maxX = this.getParent().getScene().getWidth();
 		double maxY = this.getParent().getScene().getHeight();
-		translate.getKeyFrames().add(new KeyFrame(Duration.millis(timeInMs),new KeyValue(this.translateXProperty(),Util.clamp(x/maxX)*maxX-maxX/2+width/2)));
-		translate.getKeyFrames().add(new KeyFrame(Duration.millis(timeInMs),new KeyValue(this.translateYProperty(),Util.clamp(y/maxY)*maxY-maxY/2+height/2)));
+		translate.getKeyFrames().add(new KeyFrame(Duration.millis(timeInMs),new KeyValue(this.translateXProperty(),Util.clamp(x/maxX)*maxX-maxX/2)));
+		translate.getKeyFrames().add(new KeyFrame(Duration.millis(timeInMs),new KeyValue(this.translateYProperty(),Util.clamp(y/maxY)*maxY-maxY/2)));
 		if (cycle) {
 			translate.setAutoReverse(cycle);
 			translate.setCycleCount(Animation.INDEFINITE);

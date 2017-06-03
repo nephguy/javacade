@@ -1,6 +1,7 @@
 package curveball;
 
 import framework.*;
+import javafx.scene.Cursor;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -51,27 +52,31 @@ public class Curveball extends GameRootPane {
 	}
 
 	public void onGameStart() {
+		this.setCursor(Cursor.NONE);
 		int[][] paddleArray = Sprite.spriteFromFile(this,"paddle.txt",29,45);
 		int[][] ballArray = Sprite.spriteFromFile(this, "ball.txt", 16, 16);
 		enemyPaddle = new PixelSprite(paddleArray,29*2.25,45*2.25,"paddle",Color.RED,Paint.valueOf("#FF450080"),Color.RED);
-		ball = new PixelSprite(ballArray,16*2,16*2,"ball",Color.DARKORANGE,Color.ORANGE,Color.GOLD);
+		ball = new PixelSprite(ballArray,16*4.5,16*4.5,"ball",Color.DARKORANGE,Color.ORANGE,Color.GOLD);
 		playerPaddle = new PixelSprite(paddleArray,29*4.5,45*4.5,"paddle",Color.BLUE,Paint.valueOf("#ADD8E680"),Color.BLUE);
-		this.addSprite(enemyPaddle,300,300);
+		
+		ball.scaleAnimation(0.5, 1000, true, true);
+		
+		this.addSprite(enemyPaddle,100,100);
 		this.addSprite(ball,100,100);
 		this.addSprite(playerPaddle,200,200);
 		
 	}
 	
 	public void update() {
-		
+		playerPaddle.moveTo(this.getMouseX(), this.getMouseY());
 	}
 	
 	public void onPause () {
-		
+		this.setCursor(Cursor.DEFAULT);
 	}
 	
 	public void onResume () {
-		
+		this.setCursor(Cursor.NONE);
 	}
 	
 }
