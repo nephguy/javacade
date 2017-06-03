@@ -6,6 +6,7 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.VLineTo;
 import javafx.scene.shape.HLineTo;
+import javafx.scene.shape.LineTo;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Paint;
 
@@ -63,6 +64,10 @@ public class PixelSprite extends Sprite {
 			paths[i].setFill(fills[i]);
 			paths[i].setId(id);
 			paths[i].setStrokeWidth(0);
+			// aligns all the paths so when adding them to the stack pane they are where they should be, not in the center.
+			paths[i].getElements().addAll(new MoveTo(0,0),
+					new HLineTo(realWidth),new HLineTo(0),
+					new VLineTo(realHeight), new VLineTo(0));
 		}
 		
 		for (int y = 0; y < pixels.length; y++) {

@@ -12,7 +12,9 @@ import javafx.geometry.Pos;
 
 public class Curveball extends GameRootPane {
 	
-	PixelSprite paddle;
+	PixelSprite playerPaddle;
+	PixelSprite enemyPaddle;
+	PixelSprite ball;
 	
 	public Curveball () {
 		super("Curveball","TroyBoi - On My Own.mp3");
@@ -21,28 +23,28 @@ public class Curveball extends GameRootPane {
 			public KeyCode getKey() {return KeyCode.W;}
 			public boolean fireOnce() {return false;}
 			public void action () {
-				paddle.translate(0, -3);
+				playerPaddle.translate(0, -3);
 			}
 		});
 		addKeyBinding(new KeyAction () {
 			public KeyCode getKey() {return KeyCode.A;}
 			public boolean fireOnce() {return false;}
 			public void action () {
-				paddle.translate(-3, 0);
+				playerPaddle.translate(-3, 0);
 			}
 		});
 		addKeyBinding(new KeyAction () {
 			public KeyCode getKey() {return KeyCode.S;}
 			public boolean fireOnce() {return false;}
 			public void action () {
-				paddle.translate(0, 3);
+				playerPaddle.translate(0, 3);
 			}
 		});
 		addKeyBinding(new KeyAction () {
 			public KeyCode getKey() {return KeyCode.D;}
 			public boolean fireOnce() {return false;}
 			public void action () {
-				paddle.translate(3, 0);
+				playerPaddle.translate(3, 0);
 			}
 		});
 		
@@ -50,8 +52,14 @@ public class Curveball extends GameRootPane {
 
 	public void onGameStart() {
 		int[][] paddleArray = Sprite.spriteFromFile(this,"paddle.txt",29,45);
-		paddle = new PixelSprite(paddleArray,29*4.5,45*4.5,"",Color.BLUE,Paint.valueOf("#ADD8E680"),Color.BLUE);
-		this.addSprite(paddle,200,200);
+		int[][] ballArray = Sprite.spriteFromFile(this, "ball.txt", 16, 16);
+		enemyPaddle = new PixelSprite(paddleArray,29*2.25,45*2.25,"paddle",Color.RED,Paint.valueOf("#FF450080"),Color.RED);
+		ball = new PixelSprite(ballArray,16*2,16*2,"ball",Color.DARKORANGE,Color.ORANGE,Color.GOLD);
+		playerPaddle = new PixelSprite(paddleArray,29*4.5,45*4.5,"paddle",Color.BLUE,Paint.valueOf("#ADD8E680"),Color.BLUE);
+		this.addSprite(enemyPaddle,300,300);
+		this.addSprite(ball,100,100);
+		this.addSprite(playerPaddle,200,200);
+		
 	}
 	
 	public void update() {
