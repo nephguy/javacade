@@ -4,7 +4,6 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.control.Label;
 import javafx.geometry.Pos;
@@ -20,9 +19,9 @@ import javafx.geometry.Insets;
 public class Menu extends BorderPane{
 
 	String font = "press-start.ttf";
-	StackPane parent;
+	MainMenu parent;
 	
-	public Menu (StackPane parent) {
+	public Menu (MainMenu parent) {
 		this.parent = parent;
 		this.setBackground(new Background(new BackgroundFill(
 				Color.LIGHTGRAY,

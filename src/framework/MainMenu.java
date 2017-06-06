@@ -9,22 +9,17 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 
 import framework.menu.CreditsMenu;
 import framework.menu.GameListMenu;
 import framework.menu.OptionsMenu;
-import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 
 /**
@@ -45,7 +40,7 @@ public class MainMenu extends StackPane{
 	
 	// misc
 	String font = "press-start.ttf";
-	private MediaPlayer bgMusic;
+	public MediaPlayer bgMusic;
 	String appDataPath;
 	
 	public MainMenu () {
@@ -135,25 +130,27 @@ public class MainMenu extends StackPane{
 	
 	private void firstLaunchFanciness () {
 		Rectangle blackScreen = new Rectangle(600,600,Color.BLACK);
-		Label title = Util.styleLabel(font, 45, Color.WHITE, Color.TRANSPARENT, false, true, "APCS Project");;
+		Label title = Util.styleLabel(font, 45, Color.WHITE, Color.TRANSPARENT, false, true, "APCS Project");
+		Label date = Util.styleLabel(font,18, Color.WHITE, Color.TRANSPARENT, false, true, "2017");
 		Label authors = Util.styleLabel(font, 18, Color.WHITE, Color.TRANSPARENT, false, true, "By:\nNick Hansen, Alvin Chu,\nJackson Chui, Benjamin Zhang,\nand Lovejit Kharod");
 		Label welcome = Util.styleLabel(font, 35, Color.WHITE, Color.TRANSPARENT, false, true, "Welcome To...");
-		this.getChildren().addAll(blackScreen,title,authors,welcome);
+		this.getChildren().addAll(blackScreen,title,date,authors,welcome);
 		title.setTranslateY(320);
-		authors.translateYProperty().bind(title.translateYProperty().add(100));
-		welcome.translateYProperty().bind(title.translateYProperty().add(520));
+		authors.translateYProperty().bind(title.translateYProperty().add(110));
+		date.translateYProperty().bind(title.translateYProperty().add(50));
+		welcome.translateYProperty().bind(title.translateYProperty().add(530));
 		welcome.visibleProperty().bind(blackScreen.visibleProperty());
-		Timeline titleTimeline = new Timeline(moveTo(title,4150,320),
-											  moveTo(title,8000,-70),
-											  moveTo(title,11500,-70),
+		Timeline titleTimeline = new Timeline(moveTo(title,4000,320),
+											  moveTo(title,7700,-70),
+											  moveTo(title,11000,-70),
 											  moveTo(title,16000,-530));
 		titleTimeline.play();
 		Timeline backgroundTimeline = new Timeline (vis(blackScreen,0,true),
-													vis(blackScreen,17300,false),
-													vis(blackScreen,17400,true),
-													vis(blackScreen,17500,false),
-													vis(blackScreen,17600,true),
-													vis(blackScreen,17700,false));
+													vis(blackScreen,16900,false),
+													vis(blackScreen,17000,true),
+													vis(blackScreen,17100,false),
+													vis(blackScreen,17200,true),
+													vis(blackScreen,17300,false));
 		backgroundTimeline.play();
 	}
 	private KeyFrame moveTo (Node node, double durationInMs, double pos) {

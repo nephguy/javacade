@@ -4,7 +4,13 @@ import framework.*;
 import javafx.scene.Cursor;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
+import javafx.scene.shape.HLineTo;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.VLineTo;
+import javafx.animation.Timeline;
 import javafx.geometry.Pos;
 
 /**
@@ -13,9 +19,19 @@ import javafx.geometry.Pos;
 
 public class Curveball extends GameRootPane {
 	
-	PixelSprite playerPaddle;
-	PixelSprite enemyPaddle;
-	PixelSprite ball;
+	Paddle playerPaddle;
+	Paddle enemyPaddle;
+	Ball ball;
+	Timeline scaleAnimation;
+	
+	double oldMouseX;
+	double oldMouseY;
+	double deltaX;
+	double deltaY;
+	double pathX;
+	double pathY;
+	
+	int bounceCount;
 	
 	public Curveball () {
 		super("CURVEBALL","TroyBoi - On My Own.mp3");
@@ -54,14 +70,57 @@ public class Curveball extends GameRootPane {
 	}
 
 	public void onGameStart() {
-		this.setCursor(Cursor.NONE);
-		int[][] paddleArray = PixelSprite.spriteFromFile(this,"paddle.txt",29,45);
-		int[][] ballArray = PixelSprite.spriteFromFile(this, "ball.txt", 16, 16);
-		enemyPaddle = new PixelSprite(paddleArray,29*2.25,45*2.25,"paddle",Color.RED,Paint.valueOf("#FF450080"),Color.RED);
-		ball = new PixelSprite(ballArray,16*4.5,16*4.5,"ball",Color.DARKORANGE,Color.ORANGE,Color.GOLD);
-		playerPaddle = new PixelSprite(paddleArray,29*4.5,45*4.5,"paddle",Color.BLUE,Paint.valueOf("#ADD8E680"),Color.BLUE);
 		
-		ball.scaleAnimation(0.5, 1000, true, true);
+		// draw the outside
+		for (int i = 0; i < 5; i++) {
+			double width = this.getWidth()-20-this.getWidth()/10*i;
+			double nextWidth = this.getWidth()-20-this.getWidth()/10*(i+1);
+			double height = this.getHeight()-100-this.getHeight()/10*i;
+			double nextHeight = this.getHeight()-100-this.getHeight()/10*(i+1);
+			double slashWidth = (width-nextWidth)/2;
+			double slashHeight = (height-nextHeight)/2;
+			Path border = new Path ();
+			border.setStroke(Color.WHITE);
+			border.setStrokeWidth(1);
+			border.getElements().addAll(new MoveTo(0,0), new LineTo(slashWidth,slashHeight), new LineTo(0,0),
+										new HLineTo(width), new LineTo(width-slashWidth, slashHeight), new LineTo(width,0),
+										new VLineTo(height), new LineTo(width-slashWidth, height-slashHeight), new LineTo(width,height),
+										new HLineTo(0), new LineTo(slashWidth,height-slashHeight), new LineTo(0,height),
+										new VLineTo(0));
+			
+			this.addPaneBelow(border);
+			if (i == 4) {
+				Rectangle finalBorder = new Rectangle (nextWidth,nextHeight,Color.TRANSPARENT);
+				finalBorder.setStroke(Color.WHITE);
+				finalBorder.setStrokeWidth(1);
+				this.addPaneBelow(finalBorder);
+			}
+		}
+		
+		
+		
+		this.setCursor(Cursor.NONE);
+		enemyPaddle = new Paddle(2.25,0,0,Color.RED);
+		ball = new Ball();
+		playerPaddle = new Paddle(4.5,0,0,Color.BLUE);
+		
+		ball.scaleAnimation(0.5, 1000, true, true, event -> {
+			bounceCount++;
+			if (bounceCount%2 == 0) { // player
+				if (!ball.getBoundsInParent().intersects(playerPaddle.getBoundsInParent())) resetBall();
+				else {
+					playerPaddle.flash();
+					pathX += deltaX/2;
+					pathY += deltaY/2;
+				}
+			}
+			else { // enemy
+				if (!ball.getBoundsInParent().intersects(enemyPaddle.getBoundsInParent())) resetBall();
+				else {
+					enemyPaddle.flash();
+				}
+			}
+		});
 		
 		this.addSprite(enemyPaddle);
 		this.addSprite(ball);
@@ -72,7 +131,13 @@ public class Curveball extends GameRootPane {
 	}
 	
 	public void update() {
-		playerPaddle.moveTo(this.getMouseX(), this.getMouseY());
+		playerPaddle.moveTo(getMouseX(), getMouseY());
+		deltaX = getMouseX() - oldMouseX;
+		deltaY = getMouseY() - oldMouseY;
+		oldMouseX = getMouseX();
+		oldMouseY = getMouseY();
+		
+		ball.translate(pathX, pathY);
 	}
 	
 	public void onPause () {
@@ -83,4 +148,8 @@ public class Curveball extends GameRootPane {
 		this.setCursor(Cursor.NONE);
 	}
 	
+	private void resetBall () {
+		ball.crashed();
+		pathX = pathY = 0;
+	}
 }

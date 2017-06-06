@@ -364,14 +364,19 @@ public abstract class GameRootPane extends StackPane {
 			if (keysFiredOnce.contains(key)) keysFiredOnce.remove(key);
 		});
 	}
-	/**Called upon closing the game. Ensures the game loops exits safely, and any game-specific settings are reset.
-	 * This prevents settings leaking from one game to another, and readies it for the game's next launch.**/
+	/***/
 	public void disarm () {
 		gameLoop.stop();
-		bgMusic.stop();
-		keyBindings.clear();
+		if (bgMusic != null) bgMusic.stop();
 		timeElapsedInMs = timeElapsedInS = hh = mm = ss = 0;
 		updateTimer();
+	}
+	/**Called upon closing the game. Ensures the game loops exits safely, and any game-specific settings are reset.
+	 * This prevents settings leaking from one game to another, and readies it for the game's next launch.**/
+	public void close () {
+		gameLoop.stop();
+		if (bgMusic != null) bgMusic.stop();
+		keyBindings.clear();
 	}
 	
 	public double getTimeElapsedInMs () {
@@ -427,5 +432,15 @@ public abstract class GameRootPane extends StackPane {
 	}
 	public void removeSprite (Sprite sprite) {
 		spritePane.getChildren().remove(sprite);
+	}
+	
+	public void restart () {
+		gameLoop.stop();
+		disarm();
+		spritePane.getChildren().clear();
+		setBgMusic(backgroundMusicFileName, musicVolume);
+		arm();
+		onGameStart();
+		gameLoop.play();
 	}
 }

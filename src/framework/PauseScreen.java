@@ -45,17 +45,12 @@ public class PauseScreen extends Pane {
 		});
 		restart = Util.styleLabel(font,20,true,"Restart");
 		restart.setOnMouseClicked(event -> {
-			parentGame.gameLoop.stop();
-			parentGame.gameLoop.play();
-			parentGame.disarm();
-			parentGame.arm();
-			parentGame.setBgMusic(parentGame.backgroundMusicFileName, parentGame.musicVolume);
-			parentGame.getChildren().clear();
-			parentGame.onGameStart();
+			parentGame.removePane(this);
+			parentGame.restart();
 		});
 		exit = Util.styleLabel(font,20,true,"Exit Game");
 		exit.setOnMouseClicked(event -> {
-			parentGame.disarm();
+			parentGame.close();
 			this.getScene().setRoot(new MainMenu());
 			event.consume();
 		});

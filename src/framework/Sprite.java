@@ -1,18 +1,13 @@
 package framework;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.animation.Animation.Status;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
@@ -24,25 +19,32 @@ import javafx.util.Duration;
 
 public abstract class Sprite extends StackPane{
 
-	boolean constrainToScene;
+	boolean constrainToBoundingBox;
 	
 	private Timeline scale = new Timeline();
+	public Timeline getScaleAnim() {return scale;}
 	private Timeline translate = new Timeline();
+	public Timeline getTranslateAnim() {return translate;}
 	private Timeline rotate = new Timeline();
+	public Timeline getRotateAnim() {return rotate;}
 	private boolean interruptTranslate = false;
 	private boolean interruptScale = false;
 	private boolean interruptRotate = false;
 	
 	// used for moveTo();
-	//private double height;
-	//private double width;
+	double boundX;
+	double boundY;
 	
-	public Sprite (double height, double width) {
+	public Sprite (double width, double height) {
+		this(width,height,600,600);
+	}
+	
+	public Sprite (double width, double height, double boundX, double boundY) {
 		setMaxSize(width, height);
 		setMinSize(width, height);
-		//this.height = height;
-		//this.width = width;
-		constrainToScene = true;
+		this.boundX = boundX;
+		this.boundY = boundY;
+		constrainToBoundingBox = true;
 	}
 	
 /****************************************************************************************************/
@@ -62,15 +64,20 @@ public abstract class Sprite extends StackPane{
 	 * @param allowInterrupt set if the animation can be stopped when a manual scale is requested
 	 * **/
 	public void scaleAnimation (double scaleBy, double timeInMs, boolean cycle, boolean allowInterrupt) {
+		this.scaleAnimation(scaleBy, timeInMs, cycle, allowInterrupt,null);
+	}
+	
+	public void scaleAnimation (double scaleBy, double timeInMs, boolean cycle, boolean allowInterrupt, EventHandler<ActionEvent> onFinish) {
 		interruptScale = allowInterrupt;
 		scale.getKeyFrames().clear();	// APPARENTLY, to stop the animation, you NEED
 		scale = new Timeline ();		// these two lines in EXACTLY this order. I have no idea why.
-		scale.getKeyFrames().add(new KeyFrame(Duration.millis(timeInMs),new KeyValue(this.scaleXProperty(),scaleBy)));
+		double originalScaleX = this.getScaleX();
+		double originalScaleY = this.getScaleY();
+		scale.getKeyFrames().add(new KeyFrame(Duration.millis(timeInMs),onFinish,new KeyValue(this.scaleXProperty(),scaleBy)));
 		scale.getKeyFrames().add(new KeyFrame(Duration.millis(timeInMs),new KeyValue(this.scaleYProperty(),scaleBy)));
-		if (cycle) {
-			scale.setAutoReverse(cycle);
-			scale.setCycleCount(Animation.INDEFINITE);
-		}
+		scale.getKeyFrames().add(new KeyFrame(Duration.millis(timeInMs*2),onFinish,new KeyValue(this.scaleXProperty(),originalScaleX)));
+		scale.getKeyFrames().add(new KeyFrame(Duration.millis(timeInMs*2),new KeyValue(this.scaleYProperty(),originalScaleY)));
+		if (cycle) scale.setCycleCount(Animation.INDEFINITE);
 		scale.play();
 	}
 	
@@ -88,14 +95,13 @@ public abstract class Sprite extends StackPane{
 	 * **/
 	public void translate (double x, double y) {
 		if (interruptTranslate && translate.getCurrentRate() != 0) translate.stop();
-		if (constrainToScene) {
-			double maxWidth = this.getScene().getWidth();
-			double maxHeight = this.getScene().getHeight();
-			Bounds bounds = this.getBoundsInParent();
-			if (bounds.getMaxX() + x > maxWidth ||
-				bounds.getMinX() + x < 0 ||
-				bounds.getMaxY() + y > maxHeight ||
-				bounds.getMinY() + y < 0) return;
+		if (constrainToBoundingBox) {
+			
+			Bounds spriteBounds = this.getBoundsInParent();
+			if (spriteBounds.getMaxX() + x > boundX ||
+				spriteBounds.getMinX() + x < 0 ||
+				spriteBounds.getMaxY() + y > boundY ||
+				spriteBounds.getMinY() + y < 0) return;
 		}
 		this.setTranslateX(this.getTranslateX() + x);
 		this.setTranslateY(this.getTranslateY() + y);
@@ -274,7 +280,14 @@ public abstract class Sprite extends StackPane{
 		if (scale.getStatus() == Status.PAUSED) scale.play();
 		if (translate.getStatus() == Status.PAUSED) translate.play();
 		if (rotate.getStatus() == Status.PAUSED) rotate.play();
-	}	
+	}
+	
+	/**Master stop function. Stops all currently playing animations on the sprite**/
+	public void stop () {
+		scale.stop();
+		translate.stop();
+		rotate.stop();
+	}
 
 	
 /****************************************************************************************************/
@@ -322,12 +335,12 @@ public abstract class Sprite extends StackPane{
 	
 	/**Set if the sprite is to be prevented from moving outside of the scene or not.**/
 	public void setConstrainToScene (boolean bool) {
-		constrainToScene = bool;
+		constrainToBoundingBox = bool;
 	}
 	
 	/**Returns a boolean representing if the sprite is to be prevented from moving outside of the scene or not.**/
 	public boolean getConstrainToScene () {
-		return constrainToScene;
+		return constrainToBoundingBox;
 	}
 	
 }

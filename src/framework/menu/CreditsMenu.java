@@ -1,9 +1,9 @@
 package framework.menu;
 
+import framework.MainMenu;
 import framework.Util;
 
 import javafx.geometry.Pos;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 /**
@@ -17,7 +17,7 @@ public class CreditsMenu extends Menu{
 	VBox titles;
 	VBox authors;
 	
-	public CreditsMenu (StackPane parent) {
+	public CreditsMenu (MainMenu parent) {
 		super(parent);
 		
 		titles = new VBox();
@@ -37,6 +37,9 @@ public class CreditsMenu extends Menu{
 		
 		/**ADD YOUR CREDIT HERE**/
 		addCredit("Curveball","Nick Hansen");
+		addCredit("Space Invaders","Lovejit Kharod");
+		addCredit("Tron Snake","Benjamin Zhang");
+		addCredit("4-D Tetris","Nick Hansen");
 		
 		
 		/**ADD YOUR CREDIT HERE**/

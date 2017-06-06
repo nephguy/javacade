@@ -10,7 +10,6 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.VLineTo;
 import javafx.scene.shape.HLineTo;
-import javafx.scene.shape.LineTo;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Paint;
 
@@ -57,8 +56,12 @@ public class PixelSprite extends Sprite {
 	 * @param id id of this sprite, used in checking collisions
 	 * @param fills the colors of the sprite.
 	 */
-	public PixelSprite (int[][] pixels, double realHeight, double realWidth, String id , Paint... fills) {
-		super(realHeight,realWidth);
+	public PixelSprite (int[][] pixels, double realWidth, double realHeight, String id , Paint... fills) {
+		this(pixels,realHeight,realWidth,600,600,id,fills);
+	}
+	
+	public PixelSprite (int[][] pixels, double realWidth, double realHeight, double boundX, double boundY, String id, Paint... fills) {
+		super(realWidth,realHeight,boundX,boundY);
 		double pHeight = realHeight / pixels.length;
 		double pWidth = realWidth / pixels[0].length;
 		
@@ -107,7 +110,7 @@ public class PixelSprite extends Sprite {
 		this(pixels,realHeight,realWidth,"",fills);
 	}
 	
-	public static int[][] spriteFromFile (GameRootPane calledFrom, String spriteFileName, int heightInPixels, int widthInPixels) {
+	public static int[][] parseSprite (String packageName, String spriteFileName, int widthInPixels, int heightInPixels) {
 		int[][] vals = new int[heightInPixels][widthInPixels];
 		String line;
 		int row = 0;
@@ -116,7 +119,7 @@ public class PixelSprite extends Sprite {
 		// gets the line, then iterates along it, adding the parsed ints to the 2d int array;
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(
-					"src/" + calledFrom.getClass().getPackage().getName() + "/sprite/" + spriteFileName));
+					"src/" + packageName + "/sprite/" + spriteFileName));
 			while ((line = reader.readLine()) != null) {
 				final String[] lineArray = line.trim().split(",");
 				for (int col = 0; col < widthInPixels; col++) {

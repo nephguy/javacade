@@ -5,12 +5,12 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.image.ImageView;
 
 import framework.GameRootPane;
+import framework.MainMenu;
 import framework.Util;
 
 /**IMPORT GAMES HERE**/
@@ -29,7 +29,7 @@ public class GameListMenu extends Menu {
 	
 	TilePane games;
 	
-	public GameListMenu (StackPane parent) {
+	public GameListMenu (MainMenu parent) {
 		super(parent);
 		
 		games = new TilePane();
@@ -60,6 +60,7 @@ public class GameListMenu extends Menu {
 		gameButton.setCursor(Cursor.HAND);
 		gameButton.setOnMouseClicked(event -> {
 			this.getScene().setRoot(game);
+			parent.bgMusic.stop();
 		});
 		
 		games.getChildren().add(gameButton);
