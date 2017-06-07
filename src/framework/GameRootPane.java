@@ -1,5 +1,6 @@
 package framework;
 
+import java.awt.MouseInfo;
 import java.util.ArrayList;
 
 import javafx.scene.layout.Background;
@@ -58,12 +59,14 @@ public abstract class GameRootPane extends StackPane {
 	protected Label tutorial;
 	protected Label backToMenu;
 	
+	// mouse stuff
+	private double mouseX;
+	private double mouseY;
+	
 	// general variables
 	protected StackPane spritePane;
 	protected boolean paused;
 	PauseScreen pauseScreen;
-	private double mouseX;
-	private double mouseY;
 	String font;
 	protected String packageName;
 	protected MediaPlayer bgMusic;
@@ -101,12 +104,6 @@ public abstract class GameRootPane extends StackPane {
 		setMinWidth(600);
 		setMaxHeight(600);
 		setBackground(Color.ALICEBLUE);
-		
-		// track mouse movement
-		this.setOnMouseMoved(event -> {
-			mouseX = event.getX();
-			mouseY = event.getY();
-		});
 		
 		// game loop. runs every frame
 		gameUpdate = event -> {
@@ -362,6 +359,13 @@ public abstract class GameRootPane extends StackPane {
 			KeyCode key = event.getCode();
 			keysPressed.remove(key);
 			if (keysFiredOnce.contains(key)) keysFiredOnce.remove(key);
+		});
+		
+		// track mouse movement
+		//this.addEventFilter(MouseEvent.MOUSE_MOVED, event -> {
+		this.setOnMouseMoved(event -> {
+			mouseX = event.getX();
+			mouseY = event.getY();
 		});
 	}
 	/***/

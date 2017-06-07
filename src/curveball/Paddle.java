@@ -11,9 +11,10 @@ import javafx.util.Duration;
 
 public class Paddle extends PixelSprite {
 
-	public Paddle (double scale, double boundX, double boundY, Color color) {
-		super(PixelSprite.parseSprite("curveball", "paddle.txt", 45, 29),45*scale,29*scale,boundX,boundY,"paddle",
+	public Paddle (double scale, double lowBoundX, double highBoundX, double lowBoundY, double highBoundY, Color color) {
+		super(PixelSprite.parseSprite("curveball", "paddle.txt", 45, 29),45*scale,29*scale,"paddle",
 				color,Paint.valueOf("#d3d3d340")/*color.deriveColor(1, 0.5, 1.25, 0.25)*/,color);
+		this.setSpriteBounds(lowBoundX, highBoundX, lowBoundY, highBoundY);
 	}
 	
 	public void flash () {

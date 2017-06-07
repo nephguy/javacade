@@ -32,18 +32,14 @@ public abstract class Sprite extends StackPane{
 	private boolean interruptRotate = false;
 	
 	// used for moveTo();
-	double boundX;
-	double boundY;
+	double lowBoundX;
+	double highBoundX = 600;
+	double lowBoundY;
+	double highBoundY = 600;
 	
 	public Sprite (double width, double height) {
-		this(width,height,600,600);
-	}
-	
-	public Sprite (double width, double height, double boundX, double boundY) {
 		setMaxSize(width, height);
 		setMinSize(width, height);
-		this.boundX = boundX;
-		this.boundY = boundY;
 		constrainToBoundingBox = true;
 	}
 	
@@ -96,15 +92,19 @@ public abstract class Sprite extends StackPane{
 	public void translate (double x, double y) {
 		if (interruptTranslate && translate.getCurrentRate() != 0) translate.stop();
 		if (constrainToBoundingBox) {
-			
 			Bounds spriteBounds = this.getBoundsInParent();
-			if (spriteBounds.getMaxX() + x > boundX ||
-				spriteBounds.getMinX() + x < 0 ||
-				spriteBounds.getMaxY() + y > boundY ||
-				spriteBounds.getMinY() + y < 0) return;
+			if (!(spriteBounds.getMaxX() + x > highBoundX ||
+				spriteBounds.getMinX() + x < lowBoundX))
+				this.setTranslateX(this.getTranslateX() + x);
+				
+			if (!(spriteBounds.getMaxY() + y > highBoundY ||
+				spriteBounds.getMinY() + y < lowBoundY))
+				this.setTranslateY(this.getTranslateY() + y);
 		}
-		this.setTranslateX(this.getTranslateX() + x);
-		this.setTranslateY(this.getTranslateY() + y);
+		else {
+			this.setTranslateX(this.getTranslateX() + x);
+			this.setTranslateY(this.getTranslateY() + y);
+		}
 	}
 	
 	/**Smoothly translates the sprite from its current position to the specified position over a period of time.
@@ -332,6 +332,13 @@ public abstract class Sprite extends StackPane{
 	}
 	
 /****************************************************************************************************/
+	
+	protected void setSpriteBounds(double lowBoundX, double highBoundX, double lowBoundY, double highBoundY) {
+		this.lowBoundX = lowBoundX;
+		this.highBoundX = highBoundX;
+		this.lowBoundY = lowBoundY;
+		this.highBoundY = highBoundY;
+	}
 	
 	/**Set if the sprite is to be prevented from moving outside of the scene or not.**/
 	public void setConstrainToScene (boolean bool) {

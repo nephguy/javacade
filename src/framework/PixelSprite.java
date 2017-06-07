@@ -56,12 +56,8 @@ public class PixelSprite extends Sprite {
 	 * @param id id of this sprite, used in checking collisions
 	 * @param fills the colors of the sprite.
 	 */
-	public PixelSprite (int[][] pixels, double realWidth, double realHeight, String id , Paint... fills) {
-		this(pixels,realHeight,realWidth,600,600,id,fills);
-	}
-	
-	public PixelSprite (int[][] pixels, double realWidth, double realHeight, double boundX, double boundY, String id, Paint... fills) {
-		super(realWidth,realHeight,boundX,boundY);
+	public PixelSprite (int[][] pixels, double realWidth, double realHeight, String id, Paint... fills) {
+		super(realWidth,realHeight);
 		double pHeight = realHeight / pixels.length;
 		double pWidth = realWidth / pixels[0].length;
 		

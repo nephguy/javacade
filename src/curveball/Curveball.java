@@ -1,5 +1,9 @@
 package curveball;
 
+import java.awt.AWTException;
+import java.awt.MouseInfo;
+import java.awt.Robot;
+
 import framework.*;
 import javafx.scene.Cursor;
 import javafx.scene.input.KeyCode;
@@ -10,8 +14,9 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.VLineTo;
-import javafx.animation.Timeline;
 import javafx.geometry.Pos;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 
 /**
  * @author Nick Hansen
@@ -22,22 +27,27 @@ public class Curveball extends GameRootPane {
 	Paddle playerPaddle;
 	Paddle enemyPaddle;
 	Ball ball;
-	Timeline scaleAnimation;
 	
-	double oldMouseX;
-	double oldMouseY;
 	double deltaX;
 	double deltaY;
-	double pathX;
-	double pathY;
+	double ballX;
+	double ballY;
+	Robot mouseMover;
+	double absCenterX;
+	double absCenterY;
+	boolean firedByRobot = true;
 	
 	int bounceCount;
 	
 	public Curveball () {
 		super("CURVEBALL","TroyBoi - On My Own.mp3");
 		
-		initMenu(60, 20, Color.LIGHTSKYBLUE, Util.radialGradient(0.5, 0.5, Color.DARKSLATEGRAY, Color.BLACK), "", "");
+		initMenu(60, 20, Color.BLACK, Color.LIGHTSLATEGRAY, "", "");
 		
+		try {
+			mouseMover = new Robot();
+		} catch (AWTException e) {}
+		/*
 		addKeyBinding(new KeyAction () {
 			public KeyCode getKey() {return KeyCode.W;}
 			public boolean fireOnce() {return false;}
@@ -45,31 +55,12 @@ public class Curveball extends GameRootPane {
 				playerPaddle.translate(0, -3);
 			}
 		});
-		addKeyBinding(new KeyAction () {
-			public KeyCode getKey() {return KeyCode.A;}
-			public boolean fireOnce() {return false;}
-			public void action () {
-				playerPaddle.translate(-3, 0);
-			}
-		});
-		addKeyBinding(new KeyAction () {
-			public KeyCode getKey() {return KeyCode.S;}
-			public boolean fireOnce() {return false;}
-			public void action () {
-				playerPaddle.translate(0, 3);
-			}
-		});
-		addKeyBinding(new KeyAction () {
-			public KeyCode getKey() {return KeyCode.D;}
-			public boolean fireOnce() {return false;}
-			public void action () {
-				playerPaddle.translate(3, 0);
-			}
-		});
+		*/
 		
 	}
 
 	public void onGameStart() {
+		this.setBackground(Color.BLACK);
 		
 		// draw the outside
 		for (int i = 0; i < 5; i++) {
@@ -98,11 +89,26 @@ public class Curveball extends GameRootPane {
 		}
 		
 		
+		this.setOnMouseMoved(event -> {
+			if (!paused) {
+				absCenterX = MouseInfo.getPointerInfo().getLocation().getX() - event.getX() + this.getWidth()/2;
+				absCenterY = MouseInfo.getPointerInfo().getLocation().getY() - event.getY() + this.getHeight()/2;
+				if (!firedByRobot) {
+					deltaX = event.getX() - 300;
+					deltaY = event.getY() - 300;
+					playerPaddle.translate(deltaX, deltaY);
+					firedByRobot = true;
+					mouseMover.mouseMove((int)absCenterX, (int)absCenterY);
+				}
+				else firedByRobot = false;
+				
+			}
+		});
 		
 		this.setCursor(Cursor.NONE);
-		enemyPaddle = new Paddle(2.25,0,0,Color.RED);
+		enemyPaddle = new Paddle(2.25,0,0,0,0,Color.RED);
 		ball = new Ball();
-		playerPaddle = new Paddle(4.5,0,0,Color.BLUE);
+		playerPaddle = new Paddle(4.5,10,590,50,550,Color.BLUE);
 		
 		ball.scaleAnimation(0.5, 1000, true, true, event -> {
 			bounceCount++;
@@ -110,8 +116,8 @@ public class Curveball extends GameRootPane {
 				if (!ball.getBoundsInParent().intersects(playerPaddle.getBoundsInParent())) resetBall();
 				else {
 					playerPaddle.flash();
-					pathX += deltaX/2;
-					pathY += deltaY/2;
+					ballX = deltaX;
+					ballY = deltaY;
 				}
 			}
 			else { // enemy
@@ -131,13 +137,8 @@ public class Curveball extends GameRootPane {
 	}
 	
 	public void update() {
-		playerPaddle.moveTo(getMouseX(), getMouseY());
-		deltaX = getMouseX() - oldMouseX;
-		deltaY = getMouseY() - oldMouseY;
-		oldMouseX = getMouseX();
-		oldMouseY = getMouseY();
 		
-		ball.translate(pathX, pathY);
+		ball.translate(ballX, ballY);
 	}
 	
 	public void onPause () {
@@ -150,6 +151,6 @@ public class Curveball extends GameRootPane {
 	
 	private void resetBall () {
 		ball.crashed();
-		pathX = pathY = 0;
+		ballX = ballY = 0;
 	}
 }
