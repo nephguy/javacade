@@ -17,6 +17,7 @@ import framework.Util;
 
 import curveball.Curveball;
 import spaceinvaders.SpaceInvaders;
+import tron_snake.TronSnake;
 
 /**IMPORT GAMES HERE**/
 
@@ -41,8 +42,7 @@ public class GameListMenu extends Menu {
 		/**ADD YOUR GAME HERE**/
 		addGame (new Curveball());
 		addGame (new SpaceInvaders());
-		
-		
+		addGame (new TronSnake());
 		/**ADD YOUR GAME HERE**/
 	}
 	
