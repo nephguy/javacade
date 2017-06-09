@@ -16,7 +16,6 @@ import framework.Util;
 /**IMPORT GAMES HERE**/
 
 import curveball.Curveball;
-import spaceinvaders.SpaceInvaders;
 
 /**IMPORT GAMES HERE**/
 
@@ -40,7 +39,6 @@ public class GameListMenu extends Menu {
 		
 		/**ADD YOUR GAME HERE**/
 		addGame (new Curveball());
-		addGame (new SpaceInvaders());
 		
 		
 		
