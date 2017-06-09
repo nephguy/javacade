@@ -14,6 +14,7 @@ public class SpaceInvaders extends GameRootPane {
 	PixelSprite wallLeft;
 	PixelSprite wallRight;
 	PixelSprite wallTop;
+	PixelSprite wallBottom;
 	
 	int shipPosX;
 	int invadersLeft;
@@ -35,7 +36,7 @@ public class SpaceInvaders extends GameRootPane {
 	
 	public SpaceInvaders ()
 	{
-		super("Space\nInvaders","press-start.ttf","SpaceInvadersTheme.mp3",50,10);
+		super("Space\nInvaders","press-start.ttf","SpaceInvadersTheme.mp3",50,50);
 		
 		initMenu(50,30,Color.WHITE, Color.BLACK, "SpaceInvadersTheme.mp3","Kill the aliens");
 		
@@ -55,8 +56,8 @@ public class SpaceInvaders extends GameRootPane {
 			public KeyCode getKey() {return KeyCode.A;}
 			public boolean fireOnce() {return false;}
 			public void action () {
-				ship.translate(-5, 0);
-				if (shipPosX > 25) shipPosX -= 5;
+				ship.translate(-10, 0);
+				if (shipPosX > 25) shipPosX -= 10;
 				
 			}
 		});
@@ -64,8 +65,8 @@ public class SpaceInvaders extends GameRootPane {
 			public KeyCode getKey() {return KeyCode.D;}
 			public boolean fireOnce() {return false;}
 			public void action () {
-				ship.translate(5, 0);
-				if (shipPosX < 570) shipPosX += 5;
+				ship.translate(10, 0);
+				if (shipPosX < 570) shipPosX += 10;
 			}
 		});
 		addKeyBinding(new KeyAction () {
@@ -111,11 +112,13 @@ public class SpaceInvaders extends GameRootPane {
 		wallLeft = new PixelSprite(spriteWall, 0, 600, Color.TRANSPARENT);
 		wallRight = new PixelSprite(spriteWall, 0, 600, Color.TRANSPARENT);
 		wallTop = new PixelSprite(spriteWall, 600, 0, Color.TRANSPARENT);
+		wallBottom = new PixelSprite(spriteWall, 600, 0, Color.TRANSPARENT);
 		
 		this.addSprite(ship,300,550);
 		this.addSprite(wallLeft,5,300);
 		this.addSprite(wallRight,595,300);
 		this.addSprite(wallTop,300,5);
+		this.addSprite(wallBottom,300,575);
 		
 		for (int initList = 0; initList < 8; initList++) {
 			listInv1.add(new PixelSprite(spriteInvader1,50,50,"enemy",Color.WHITE));
@@ -133,9 +136,10 @@ public class SpaceInvaders extends GameRootPane {
 	}
 	
 	public void update() {
-		System.out.println(shipPosX);
+		//wallBottom.collided("enemy")
+		System.out.println(listBullets);
 		listBullets.forEach(b -> {
-			b.translate(0, -10);
+			b.translate(0, -20);
 			if (b.collided("enemy")) {
 				removeSprite(b.getCollided("enemy"));
 				bulletImpacted = true;
@@ -174,8 +178,11 @@ public class SpaceInvaders extends GameRootPane {
 		});
 		
 		listInv1.forEach(inv -> {
+			if (inv.collided(ship)) {
+				removeSprite(ship);
+			}
 			if (movingDown) {
-				inv.translate(0, 5);
+				inv.translate(0, 20);
 			}
 			if (movingRight) {
 				inv.translate(2, 0);
@@ -184,8 +191,12 @@ public class SpaceInvaders extends GameRootPane {
 			}
 		});
 		listInv2.forEach(inv -> {
+			if (inv.collided(ship)) {
+				removeSprite(ship);
+				
+			}
 			if (movingDown) {
-				inv.translate(0, 5);
+				inv.translate(0, 20);
 			}
 			if (movingRight) {
 				inv.translate(2, 0);
@@ -194,7 +205,24 @@ public class SpaceInvaders extends GameRootPane {
 			}
 		});
 		
-		if (invadersLeft == 0) onGameStart();
+		if (invadersLeft == 0) {
+			int listNum = 0;
+			
+			for (int x = 40; x <= 550; x += 65)
+			{
+				this.addSprite(listInv1.get(listNum), x, 100);
+				this.addSprite(listInv2.get(listNum), x, 175);
+				listNum++;
+			}
+			invadersLeft = 16;
+		} else if (wallBottom.collided("enemy")) {
+			listInv1.forEach(inv -> {
+				removeSprite(inv);
+			});
+			listInv2.forEach(inv -> {
+				removeSprite(inv);
+			});
+		}
 		
 		movingDown = false;
 	}
