@@ -15,9 +15,12 @@ public class SpaceInvaders extends GameRootPane {
 	PixelSprite wallRight;
 	PixelSprite wallTop;
 	
-	int shipPosX = 300;
+	int shipPosX;
+	int invadersLeft;
 	boolean movingRight = true;
 	boolean bulletExists = false;
+	boolean movingDown = false;
+	boolean bulletImpacted = false;
 	
 	Score score;
 	ArrayList<PixelSprite> listBullets = new ArrayList<PixelSprite>();
@@ -77,6 +80,7 @@ public class SpaceInvaders extends GameRootPane {
 	public void onGameStart() {
 		score = new Score(this, 20, Color.WHITE, Color.TRANSPARENT, Pos.TOP_CENTER);
 		shipPosX = 300;
+		invadersLeft = 16;
 		setBackground(Color.BLACK);
 		
 		int[][] spriteShip = new int [][]{{0,0,0,0,0,0,1,0,0,0,0,0,0},
@@ -111,7 +115,7 @@ public class SpaceInvaders extends GameRootPane {
 		this.addSprite(ship,300,550);
 		this.addSprite(wallLeft,5,300);
 		this.addSprite(wallRight,595,300);
-		this.addSprite(wallTop,300,595);
+		this.addSprite(wallTop,300,5);
 		
 		for (int initList = 0; initList < 8; initList++) {
 			listInv1.add(new PixelSprite(spriteInvader1,50,50,"enemy",Color.WHITE));
@@ -134,37 +138,65 @@ public class SpaceInvaders extends GameRootPane {
 			b.translate(0, -10);
 			if (b.collided("enemy")) {
 				removeSprite(b.getCollided("enemy"));
-				//removeSprite(b);
+				bulletImpacted = true;
 				score.addToScore(10);
 				bulletExists = false;
+				invadersLeft--;
 			}
 			if (b.collided(wallTop)) {
-				//removeSprite(b);
+				bulletImpacted = true;
 				bulletExists = false;
 			}
 		});
+		if (bulletImpacted) {
+			removeSprite(listBullets.get(0));
+			listBullets.clear();
+			bulletImpacted = false;
+		}
 		
 		listInv1.forEach(inv -> {
 			if (inv.collided(wallRight)) {
 				movingRight = false;
+				movingDown = true;
 			} else if (inv.collided(wallLeft)) {
 				movingRight = true;
-			}
-		});
-		listInv1.forEach(inv -> {
-			if (movingRight) {
-				inv.translate(5, 0);
-			} else if (!movingRight) {
-				inv.translate(-5, 0);
+				movingDown = true;
 			}
 		});
 		listInv2.forEach(inv -> {
-			if (movingRight) {
-				inv.translate(5, 0);
-			} else if (!movingRight) {
-				inv.translate(-5, 0);
+			if (inv.collided(wallRight)) {
+				movingRight = false;
+				movingDown = true;
+			} else if (inv.collided(wallLeft)) {
+				movingRight = true;
+				movingDown = true;
 			}
 		});
+		
+		listInv1.forEach(inv -> {
+			if (movingDown) {
+				inv.translate(0, 5);
+			}
+			if (movingRight) {
+				inv.translate(2, 0);
+			} else if (!movingRight) {
+				inv.translate(-2, 0);
+			}
+		});
+		listInv2.forEach(inv -> {
+			if (movingDown) {
+				inv.translate(0, 5);
+			}
+			if (movingRight) {
+				inv.translate(2, 0);
+			} else if (!movingRight) {
+				inv.translate(-2, 0);
+			}
+		});
+		
+		if (invadersLeft == 0) onGameStart();
+		
+		movingDown = false;
 	}
 	
 	public void onPause () {
