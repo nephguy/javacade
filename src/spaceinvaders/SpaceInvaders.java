@@ -1,6 +1,7 @@
 package spaceinvaders;
 
 import framework.*;
+import java.util.ArrayList;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.geometry.Pos;
@@ -10,23 +11,41 @@ public class SpaceInvaders extends GameRootPane {
 	PixelSprite ship;
 	PixelSprite invader1;
 	PixelSprite invader2;
-	PixelSprite bullet;
+	PixelSprite wallLeft;
+	PixelSprite wallRight;
+	PixelSprite wallTop;
+	
+	int shipPosX = 300;
+	boolean movingRight = true;
+	boolean bulletExists = false;
 	
 	Score score;
+	ArrayList<PixelSprite> listBullets = new ArrayList<PixelSprite>();
+	ArrayList<PixelSprite> listInv1 = new ArrayList<PixelSprite>();
+	ArrayList<PixelSprite> listInv2 = new ArrayList<PixelSprite>();
 	
-	public SpaceInvaders () 
+	private int[][] spriteBullet = new int [][]{{0,1,0},
+												{1,1,1},
+												{1,1,1},
+												{1,1,1},
+												{1,1,1}};
+	
+	public SpaceInvaders ()
 	{
-		super("Space\nInvaders","press-start.ttf","SpaceInvadersTheme.mp3",50,5);
+		super("Space\nInvaders","press-start.ttf","SpaceInvadersTheme.mp3",50,10);
 		
-		String tutorialText = "test"+
-							  "test2";
 		initMenu(50,30,Color.WHITE, Color.BLACK, "SpaceInvadersTheme.mp3","Kill the aliens");
 		
 		addKeyBinding(new KeyAction () {
 			public KeyCode getKey() {return KeyCode.W;}
 			public boolean fireOnce() {return true;}
 			public void action () {
-				
+				if (!bulletExists) {
+					PixelSprite bullet = new PixelSprite(spriteBullet,5,10,Color.WHITE);
+					addSprite(bullet, shipPosX, 550);
+					listBullets.add(bullet);
+					bulletExists = true;
+				}
 			}
 		});
 		addKeyBinding(new KeyAction () {
@@ -34,6 +53,8 @@ public class SpaceInvaders extends GameRootPane {
 			public boolean fireOnce() {return false;}
 			public void action () {
 				ship.translate(-5, 0);
+				if (shipPosX > 25) shipPosX -= 5;
+				
 			}
 		});
 		addKeyBinding(new KeyAction () {
@@ -41,34 +62,23 @@ public class SpaceInvaders extends GameRootPane {
 			public boolean fireOnce() {return false;}
 			public void action () {
 				ship.translate(5, 0);
-			}
-		});
-		addKeyBinding(new KeyAction () {
-			public KeyCode getKey() {return KeyCode.Q;}
-			public boolean fireOnce() {return false;}
-			public void action () {
-				
+				if (shipPosX < 570) shipPosX += 5;
 			}
 		});
 		addKeyBinding(new KeyAction () {
 			public KeyCode getKey() {return KeyCode.E;}
 			public boolean fireOnce() {return false;}
 			public void action () {
-				
-			}
-		});
-		addKeyBinding(new KeyAction () {
-			public KeyCode getKey() {return KeyCode.R;}
-			public boolean fireOnce() {return false;}
-			public void action () {
-				ship.moveTo(300,600);
+				ship.moveTo(300,550);
 			}
 		});
 	}
 
 	public void onGameStart() {
 		score = new Score(this, 20, Color.WHITE, Color.TRANSPARENT, Pos.TOP_CENTER);
+		shipPosX = 300;
 		setBackground(Color.BLACK);
+		
 		int[][] spriteShip = new int [][]{{0,0,0,0,0,0,1,0,0,0,0,0,0},
 										  {0,0,0,0,0,1,1,1,0,0,0,0,0},
 										  {0,0,0,0,0,1,1,1,0,0,0,0,0},
@@ -90,34 +100,71 @@ public class SpaceInvaders extends GameRootPane {
 											  {1,1,1,1,1,1,1,1},
 											  {0,0,1,0,0,1,0,0},
 											  {0,1,0,1,1,0,1,0},
-											  {1,0,1,0,0,1,0,1}};		
-		int[][] spriteBullet = new int [][]{{0,1,0},
-										   {1,1,1},
-										   {1,1,1},
-										   {1,1,1},
-										   {1,1,1}};
+											  {1,0,1,0,0,1,0,1}};
+		int[][] spriteWall = new int [][]{{1}};
 									  		  
 		ship = new PixelSprite(spriteShip,50,50,Color.WHITE);
-		bullet = new PixelSprite(spriteBullet,50,50,Color.WHITE);
-		invader1 = new PixelSprite(spriteInvader1,50,50,"enemy",Color.WHITE);
-		invader2 = new PixelSprite(spriteInvader2,50,50,"enemy",Color.WHITE);
+		wallLeft = new PixelSprite(spriteWall, 0, 600, Color.TRANSPARENT);
+		wallRight = new PixelSprite(spriteWall, 0, 600, Color.TRANSPARENT);
+		wallTop = new PixelSprite(spriteWall, 600, 0, Color.TRANSPARENT);
 		
-		this.addSprite(ship,100,600);
-		for (int x = 10; x <= 400; x += 50)
-		{
-			this.addSprite(invader1, x, 100);
-			this.addSprite(invader2, x, 200);
+		this.addSprite(ship,300,550);
+		this.addSprite(wallLeft,5,300);
+		this.addSprite(wallRight,595,300);
+		this.addSprite(wallTop,300,595);
+		
+		for (int initList = 0; initList < 8; initList++) {
+			listInv1.add(new PixelSprite(spriteInvader1,50,50,"enemy",Color.WHITE));
+			listInv2.add(new PixelSprite(spriteInvader2,50,50,"enemy",Color.WHITE));
 		}
-		//test2.moveTo(100, 100);
-		//test2.translateAnimation(0, 100, 1000, true, false);
-		//test2.rotateAnimation(360, 1000, true, false);
+		
+		int listNum = 0;
+		
+		for (int x = 40; x <= 550; x += 65)
+		{
+			this.addSprite(listInv1.get(listNum), x, 100);
+			this.addSprite(listInv2.get(listNum), x, 175);
+			listNum++;
+		}
 	}
 	
 	public void update() {
-		if (bullet.collided("enemy")) {
-			//removeSprite(bullet.getCollided("enemy"));
-			score.addToScore(10);
-		}
+		System.out.println(shipPosX);
+		listBullets.forEach(b -> {
+			b.translate(0, -10);
+			if (b.collided("enemy")) {
+				removeSprite(b.getCollided("enemy"));
+				//removeSprite(b);
+				score.addToScore(10);
+				bulletExists = false;
+			}
+			if (b.collided(wallTop)) {
+				//removeSprite(b);
+				bulletExists = false;
+			}
+		});
+		
+		listInv1.forEach(inv -> {
+			if (inv.collided(wallRight)) {
+				movingRight = false;
+			} else if (inv.collided(wallLeft)) {
+				movingRight = true;
+			}
+		});
+		listInv1.forEach(inv -> {
+			if (movingRight) {
+				inv.translate(5, 0);
+			} else if (!movingRight) {
+				inv.translate(-5, 0);
+			}
+		});
+		listInv2.forEach(inv -> {
+			if (movingRight) {
+				inv.translate(5, 0);
+			} else if (!movingRight) {
+				inv.translate(-5, 0);
+			}
+		});
 	}
 	
 	public void onPause () {
