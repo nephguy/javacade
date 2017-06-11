@@ -13,7 +13,7 @@ public class TronSnake extends GameRootPane {
     private final int [][] onePixel = {{1}};
     private class SnakeSegment extends PixelSprite {
         public SnakeSegment(String name) {
-            super(onePixel, 1, 1, name, Color.WHITE);
+            super(onePixel, 5, 5, name, Color.WHITE);
         }
     }
 
@@ -41,10 +41,10 @@ public class TronSnake extends GameRootPane {
         UP, DOWN, LEFT, RIGHT;
     }
 
-    private final PixelSprite leftWall = new PixelSprite(onePixel, 700, 1, "wall", Color.WHITE);
-    private final PixelSprite topWall = new PixelSprite(onePixel, 1, 700, "wall", Color.WHITE);
-    private final PixelSprite rightWall = new PixelSprite(onePixel, 700, 1, "wall", Color.WHITE);
-    private final PixelSprite bottomWall = new PixelSprite(onePixel, 1, 700, "wall", Color.WHITE);
+    private final PixelSprite leftWall = new PixelSprite(onePixel, 5, 700, "wall", Color.WHITE);
+    private final PixelSprite topWall = new PixelSprite(onePixel, 700, 5, "wall", Color.WHITE);
+    private final PixelSprite rightWall = new PixelSprite(onePixel, 5, 700, "wall", Color.WHITE);
+    private final PixelSprite bottomWall = new PixelSprite(onePixel, 700, 5, "wall", Color.WHITE);
 
     private final ArrayList<SegmentCoordinateWrapper> firstPlayerSnake = new ArrayList<>();
     private final ArrayList<SegmentCoordinateWrapper> secondPlayerSnake = new ArrayList<>();
@@ -56,8 +56,8 @@ public class TronSnake extends GameRootPane {
     private final Score secondPlayerScore;
 
     public TronSnake() {
-        super("tron_snake", "null-pointer.ttf", "loud_nigra.mp3", 100, 1);
-        initMenu(20, 12, Color.WHITE, Color.BLACK, "snow_halation.mp3", "TRON Snake");
+        super("tron_snake", "null-pointer.ttf", "eBeat.wav", 100, 5);
+        initMenu(20, 12, Color.WHITE, Color.BLACK, "eBeat.wav", "TRON Snake");
         firstPlayerScore = new Score(this, 11, Color.WHITE, Color.GRAY, Pos.TOP_LEFT);
         secondPlayerScore = new Score(this, 11, Color.WHITE, Color.GRAY, Pos.TOP_RIGHT);
     }
@@ -69,8 +69,8 @@ public class TronSnake extends GameRootPane {
         // insert walls
         addSprite(leftWall, 0, 300);
         addSprite(topWall, 300, 0);
-        addSprite(rightWall, 599, 300);
-        addSprite(bottomWall, 300, 599);
+        addSprite(rightWall, 600, 300);
+        addSprite(bottomWall, 300, 600);
 
         // first player snake
         firstPlayerSnake.add(new SegmentCoordinateWrapper("firstPlayerSnakeHead", new Coordinate(150, 300)));
@@ -293,19 +293,19 @@ public class TronSnake extends GameRootPane {
         switch(d1) {
             case UP:
                 firstPlayerSnake.add(0, new SegmentCoordinateWrapper("firstPlayerSnakeHead",
-                        new Coordinate(firstPlayerSnakeHeadCoordinate.x, firstPlayerSnakeHeadCoordinate.y - 1)));
+                        new Coordinate(firstPlayerSnakeHeadCoordinate.x, firstPlayerSnakeHeadCoordinate.y - 5)));
                 break;
             case DOWN:
                 firstPlayerSnake.add(0, new SegmentCoordinateWrapper("firstPlayerSnakeHead",
-                        new Coordinate(firstPlayerSnakeHeadCoordinate.x, firstPlayerSnakeHeadCoordinate.y + 1)));
+                        new Coordinate(firstPlayerSnakeHeadCoordinate.x, firstPlayerSnakeHeadCoordinate.y + 5)));
                 break;
             case LEFT:
                 firstPlayerSnake.add(0, new SegmentCoordinateWrapper("firstPlayerSnakeHead",
-                        new Coordinate(firstPlayerSnakeHeadCoordinate.x - 1, firstPlayerSnakeHeadCoordinate.y)));
+                        new Coordinate(firstPlayerSnakeHeadCoordinate.x - 5, firstPlayerSnakeHeadCoordinate.y)));
                 break;
             case RIGHT:
                 firstPlayerSnake.add(0, new SegmentCoordinateWrapper("firstPlayerSnakeHead",
-                        new Coordinate(firstPlayerSnakeHeadCoordinate.x + 1, firstPlayerSnakeHeadCoordinate.y)));
+                        new Coordinate(firstPlayerSnakeHeadCoordinate.x + 5, firstPlayerSnakeHeadCoordinate.y)));
                 break;
         }
         firstPlayerSnake.set(1, new SegmentCoordinateWrapper("firstPlayerSnakeBody", firstPlayerSnakeHeadCoordinate));
@@ -319,19 +319,19 @@ public class TronSnake extends GameRootPane {
         switch(d2) {
             case UP:
                 secondPlayerSnake.add(0, new SegmentCoordinateWrapper("secondPlayerSnakeHead",
-                        new Coordinate(secondPlayerSnakeHeadCoordinate.x, secondPlayerSnakeHeadCoordinate.y - 1)));
+                        new Coordinate(secondPlayerSnakeHeadCoordinate.x, secondPlayerSnakeHeadCoordinate.y - 5)));
                 break;
             case DOWN:
                 secondPlayerSnake.add(0, new SegmentCoordinateWrapper("secondPlayerSnakeHead",
-                        new Coordinate(secondPlayerSnakeHeadCoordinate.x, secondPlayerSnakeHeadCoordinate.y + 1)));
+                        new Coordinate(secondPlayerSnakeHeadCoordinate.x, secondPlayerSnakeHeadCoordinate.y + 5)));
                 break;
             case LEFT:
                 secondPlayerSnake.add(0, new SegmentCoordinateWrapper("secondPlayerSnakeHead",
-                        new Coordinate(secondPlayerSnakeHeadCoordinate.x - 1, secondPlayerSnakeHeadCoordinate.y)));
+                        new Coordinate(secondPlayerSnakeHeadCoordinate.x - 5, secondPlayerSnakeHeadCoordinate.y)));
                 break;
             case RIGHT:
                 secondPlayerSnake.add(0, new SegmentCoordinateWrapper("secondPlayerSnakeHead",
-                        new Coordinate(secondPlayerSnakeHeadCoordinate.x + 1, secondPlayerSnakeHeadCoordinate.y)));
+                        new Coordinate(secondPlayerSnakeHeadCoordinate.x + 5, secondPlayerSnakeHeadCoordinate.y)));
                 break;
         }
         secondPlayerSnake.set(1, new SegmentCoordinateWrapper("secondPlayerSnakeBody", secondPlayerSnakeHeadCoordinate));
@@ -345,7 +345,7 @@ public class TronSnake extends GameRootPane {
 
     private Coordinate randomCoordinate() {
         Random r = new Random();
-        return new Coordinate(r.nextInt(600), r.nextInt(600));
+        return new Coordinate(r.nextInt(120) * 5, r.nextInt(120) * 5);
     }
 
 }
