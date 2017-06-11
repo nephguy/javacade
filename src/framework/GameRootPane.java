@@ -1,6 +1,5 @@
 package framework;
 
-import java.awt.MouseInfo;
 import java.util.ArrayList;
 
 import javafx.scene.layout.Background;

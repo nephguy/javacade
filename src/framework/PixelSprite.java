@@ -94,8 +94,8 @@ public class PixelSprite extends Sprite {
 	 * <p>
 	 * Constructs a pixel sprite based on the individual pixels' dimentions, instead of the entire sprite's dimentions.
 	 */
-	public PixelSprite (int[][] pixels, String id, double pixelHeight, double pixelWidth, Paint... fills) {
-		this(pixels,pixelHeight*pixels.length,pixelWidth*pixels[0].length,id,fills);
+	public PixelSprite (int[][] pixels, String id, double pixelWidth, double pixelHeight, Paint... fills) {
+		this(pixels,pixelWidth*pixels[0].length,pixelHeight*pixels.length,id,fills);
 	}
 	
 	/**SEE OTHER CONSTRUCTOR FOR DETAILED EXPLANATION OF THIS CLASS

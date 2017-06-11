@@ -71,9 +71,11 @@ public abstract class Sprite extends StackPane{
 		double originalScaleY = this.getScaleY();
 		scale.getKeyFrames().add(new KeyFrame(Duration.millis(timeInMs),onFinish,new KeyValue(this.scaleXProperty(),scaleBy)));
 		scale.getKeyFrames().add(new KeyFrame(Duration.millis(timeInMs),new KeyValue(this.scaleYProperty(),scaleBy)));
-		scale.getKeyFrames().add(new KeyFrame(Duration.millis(timeInMs*2),onFinish,new KeyValue(this.scaleXProperty(),originalScaleX)));
-		scale.getKeyFrames().add(new KeyFrame(Duration.millis(timeInMs*2),new KeyValue(this.scaleYProperty(),originalScaleY)));
-		if (cycle) scale.setCycleCount(Animation.INDEFINITE);
+		if (cycle) {
+			scale.getKeyFrames().add(new KeyFrame(Duration.millis(timeInMs*2),onFinish,new KeyValue(this.scaleXProperty(),originalScaleX)));
+			scale.getKeyFrames().add(new KeyFrame(Duration.millis(timeInMs*2),new KeyValue(this.scaleYProperty(),originalScaleY)));
+			scale.setCycleCount(Animation.INDEFINITE);
+		}
 		scale.play();
 	}
 	
@@ -104,6 +106,7 @@ public abstract class Sprite extends StackPane{
 		else {
 			this.setTranslateX(this.getTranslateX() + x);
 			this.setTranslateY(this.getTranslateY() + y);
+			System.out.println("tfail");
 		}
 	}
 	

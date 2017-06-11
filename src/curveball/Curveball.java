@@ -7,6 +7,8 @@ import java.awt.Robot;
 import framework.*;
 import javafx.scene.Cursor;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.HLineTo;
 import javafx.scene.shape.LineTo;
@@ -14,9 +16,13 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.VLineTo;
+import javafx.scene.shape.Line;
+import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.event.EventHandler;
+import javafx.event.ActionEvent;
 
 /**
  * @author Nick Hansen
@@ -26,12 +32,23 @@ public class Curveball extends GameRootPane {
 	
 	Paddle playerPaddle;
 	Paddle enemyPaddle;
+	StackPane ballPane;
 	Ball ball;
+	Rectangle topBallColl;
+	Rectangle bottomBallColl;
+	Rectangle rightBallColl;
+	Rectangle leftBallColl;
+	
+	// 
+	private double verticalInset = 75;
+	private double horizontalInset = 10;
+	private double scaleDown = 4;
 	
 	double deltaX;
 	double deltaY;
-	double ballX;
-	double ballY;
+	double ballPathX;
+	double ballPathY;
+	
 	Robot mouseMover;
 	double absCenterX;
 	double absCenterY;
@@ -40,55 +57,25 @@ public class Curveball extends GameRootPane {
 	int bounceCount;
 	
 	public Curveball () {
-		super("CURVEBALL","TroyBoi - On My Own.mp3");
+		super("CURVEBALL","press-start.ttf","TroyBoi - On My Own.mp3",0,144);
 		
 		initMenu(60, 20, Color.BLACK, Color.LIGHTSLATEGRAY, "", "");
 		
 		try {
 			mouseMover = new Robot();
 		} catch (AWTException e) {}
-		/*
-		addKeyBinding(new KeyAction () {
-			public KeyCode getKey() {return KeyCode.W;}
-			public boolean fireOnce() {return false;}
-			public void action () {
-				playerPaddle.translate(0, -3);
-			}
-		});
-		*/
 		
 	}
 
 	public void onGameStart() {
+		// draw the background/aesthetic
+		//this.setCursor(Cursor.NONE);
 		this.setBackground(Color.BLACK);
 		
-		// draw the outside
-		for (int i = 0; i < 5; i++) {
-			double width = this.getWidth()-20-this.getWidth()/10*i;
-			double nextWidth = this.getWidth()-20-this.getWidth()/10*(i+1);
-			double height = this.getHeight()-100-this.getHeight()/10*i;
-			double nextHeight = this.getHeight()-100-this.getHeight()/10*(i+1);
-			double slashWidth = (width-nextWidth)/2;
-			double slashHeight = (height-nextHeight)/2;
-			Path border = new Path ();
-			border.setStroke(Color.WHITE);
-			border.setStrokeWidth(1);
-			border.getElements().addAll(new MoveTo(0,0), new LineTo(slashWidth,slashHeight), new LineTo(0,0),
-										new HLineTo(width), new LineTo(width-slashWidth, slashHeight), new LineTo(width,0),
-										new VLineTo(height), new LineTo(width-slashWidth, height-slashHeight), new LineTo(width,height),
-										new HLineTo(0), new LineTo(slashWidth,height-slashHeight), new LineTo(0,height),
-										new VLineTo(0));
-			
-			this.addPaneBelow(border);
-			if (i == 4) {
-				Rectangle finalBorder = new Rectangle (nextWidth,nextHeight,Color.TRANSPARENT);
-				finalBorder.setStroke(Color.WHITE);
-				finalBorder.setStrokeWidth(1);
-				this.addPaneBelow(finalBorder);
-			}
-		}
 		
 		
+		
+		// move the paddle and restrict the mouse to the scene
 		this.setOnMouseMoved(event -> {
 			if (!paused) {
 				absCenterX = MouseInfo.getPointerInfo().getLocation().getX() - event.getX() + this.getWidth()/2;
@@ -96,6 +83,7 @@ public class Curveball extends GameRootPane {
 				if (!firedByRobot) {
 					deltaX = event.getX() - 300;
 					deltaY = event.getY() - 300;
+					//System.out.println(deltaX + " " + deltaY);
 					playerPaddle.translate(deltaX, deltaY);
 					firedByRobot = true;
 					mouseMover.mouseMove((int)absCenterX, (int)absCenterY);
@@ -105,40 +93,74 @@ public class Curveball extends GameRootPane {
 			}
 		});
 		
-		this.setCursor(Cursor.NONE);
-		enemyPaddle = new Paddle(2.25,0,0,0,0,Color.RED);
-		ball = new Ball();
-		playerPaddle = new Paddle(4.5,10,590,50,550,Color.BLUE);
 		
-		ball.scaleAnimation(0.5, 1000, true, true, event -> {
+		// init collision boxes so the ball bounces
+		topBallColl = newBallColl(false);
+		bottomBallColl = newBallColl(false);
+		rightBallColl = newBallColl(true);
+		leftBallColl = newBallColl(true);
+		ball = new Ball();
+		ballPane = new StackPane(topBallColl,bottomBallColl,rightBallColl,leftBallColl,ball);
+		StackPane.setAlignment(topBallColl, Pos.TOP_CENTER);
+		StackPane.setAlignment(bottomBallColl, Pos.BOTTOM_CENTER);
+		StackPane.setAlignment(rightBallColl, Pos.CENTER_RIGHT);
+		StackPane.setAlignment(leftBallColl, Pos.CENTER_LEFT);
+		
+		
+		
+		
+		enemyPaddle = new Paddle(4.5/scaleDown,0,0,0,0,Color.RED);
+		playerPaddle = new Paddle(4.5,horizontalInset,this.getWidth()-horizontalInset,verticalInset,this.getHeight()-verticalInset,Color.BLUE);
+		
+		 
+		EventHandler<ActionEvent> bounceBall = event -> {
 			bounceCount++;
 			if (bounceCount%2 == 0) { // player
-				if (!ball.getBoundsInParent().intersects(playerPaddle.getBoundsInParent())) resetBall();
+				if (!ball.getBoundsInParent().intersects(playerPaddle.getBoundsInParent())) ;//resetBall();
 				else {
 					playerPaddle.flash();
-					ballX = deltaX;
-					ballY = deltaY;
+					ballPathX = deltaX;
+					ballPathY = deltaY;
 				}
 			}
 			else { // enemy
-				if (!ball.getBoundsInParent().intersects(enemyPaddle.getBoundsInParent())) resetBall();
+				if (!ball.getBoundsInParent().intersects(enemyPaddle.getBoundsInParent())) ;//resetBall();
 				else {
 					enemyPaddle.flash();
 				}
 			}
-		});
-		
+		};
+		ball.scaleAnimation(1/scaleDown, 1000, true, true, bounceBall);
+		addPaneBelow(ballPane);
+		addPaneAbove(rightBallColl);
 		this.addSprite(enemyPaddle);
-		this.addSprite(ball);
-		this.addSprite(playerPaddle,200,200);
-		
-		this.enableTimer(20, Color.GRAY, Color.LIGHTGRAY, Pos.TOP_CENTER);
+		this.addSprite(playerPaddle);
 		
 	}
 	
-	public void update() {
-		
-		ball.translate(ballX, ballY);
+	private Rectangle newBallColl (boolean vertical) {
+		Rectangle rect = new Rectangle(this.getWidth(),this.getHeight());
+		if (vertical) rect.setWidth(1);
+		else rect.setHeight(1);
+		rect.setStroke(Color.WHITE);
+		rect.setFill(Color.WHITE);
+		return rect;
+	}
+	
+	private void bounceBall () {
+		final boolean atRightBorder = ball.getTranslateX() + ball.getWidth()/2 >= ballPane.getWidth()/2;
+        final boolean atLeftBorder = ball.getTranslateX() - ball.getWidth()/2 <= -ballPane.getWidth()/2;
+        final boolean atBottomBorder = ball.getTranslateY() + ball.getHeight()/2 >= ballPane.getHeight()/2;
+        final boolean atTopBorder = ball.getTranslateY() - ball.getHeight()/2 <= -ballPane.getHeight()/2;
+		if (atRightBorder || atLeftBorder)
+			ballPathX *= -1;
+		if (atTopBorder || atBottomBorder)
+			ballPathY *= -1;
+	}
+	
+	public void update() { 
+		bounceBall();
+		ball.translate(ballPathX, ballPathY);
 	}
 	
 	public void onPause () {
@@ -151,6 +173,6 @@ public class Curveball extends GameRootPane {
 	
 	private void resetBall () {
 		ball.crashed();
-		ballX = ballY = 0;
+		ballPathX = ballPathY = 0;
 	}
 }
