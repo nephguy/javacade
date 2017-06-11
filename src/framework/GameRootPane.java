@@ -68,7 +68,7 @@ public abstract class GameRootPane extends StackPane {
 	PauseScreen pauseScreen;
 	String font;
 	protected String packageName;
-	protected MediaPlayer bgMusic;
+	public MediaPlayer bgMusic;
 	
 	// variables to make the pause screen and main menu work properly
 	public String gameTitle;
@@ -190,7 +190,7 @@ public abstract class GameRootPane extends StackPane {
 	}
 	
 	private void initMenu (double titleSize, double menuElementSize, Paint textColor, String menuMusicFileName, String tutorialText) {
-		if (!(menuMusicFileName.equals(null) || menuMusicFileName.equals(""))) setBgMusic(menuMusicFileName, musicVolume);
+		if (!(menuMusicFileName.equals(null) || menuMusicFileName.equals(""))) setBgMusic(menuMusicFileName, musicVolume, false);
 		VBox gameMenu = new VBox ();
 		
 		title = Util.styleLabel(font, titleSize, textColor, Color.TRANSPARENT, false, true, gameTitle);
@@ -199,7 +199,7 @@ public abstract class GameRootPane extends StackPane {
 		
 		play = Util.styleLabel(font, menuElementSize, textColor, Color.TRANSPARENT, true, true, "Play Game");
 		play.setOnMouseClicked(event -> {
-			setBgMusic(backgroundMusicFileName, musicVolume);
+			setBgMusic(backgroundMusicFileName, musicVolume, true);
 			this.removePane(gameMenu);
 			arm();
 			gameLoop.play();
@@ -245,14 +245,15 @@ public abstract class GameRootPane extends StackPane {
 	
 	/**Stops previously playing background music, initializes new background music, and begins playing it.
 	 * <p>
+	 * @param play if the music is to be played immediately
 	 * @param volume MUST be between 0.0 and 100.0
 	 * @param musicFileName the exact file name, including type extension (.mp3, .wav, etc)**/
-	protected void setBgMusic (String musicFileName, double volume) {
+	protected void setBgMusic (String musicFileName, double volume, boolean play) {
 		if (bgMusic != null) bgMusic.stop();
 		bgMusic = new MediaPlayer (Util.getMusic(packageName, musicFileName));
 		bgMusic.setCycleCount(Integer.MAX_VALUE);
 		bgMusic.setVolume(volume/100);
-		bgMusic.play();
+		if (play) bgMusic.play();
 	}
 	
 	/**This initializes the sound effect, and subsequently plays it.
@@ -441,7 +442,7 @@ public abstract class GameRootPane extends StackPane {
 		gameLoop.stop();
 		disarm();
 		spritePane.getChildren().clear();
-		setBgMusic(backgroundMusicFileName, musicVolume);
+		setBgMusic(backgroundMusicFileName, musicVolume, true);
 		arm();
 		onGameStart();
 		gameLoop.play();
