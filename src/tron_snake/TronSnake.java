@@ -2,7 +2,6 @@ package tron_snake;
 
 import framework.*;
 import javafx.geometry.Pos;
-import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
@@ -34,7 +33,6 @@ public class TronSnake extends GameRootPane {
             currentCoordinate = c;
         }
         public Coordinate getCurrentCoordinate() { return currentCoordinate; }
-        public SnakeSegment getSegment() { return segment; }
     }
 
     private enum Direction {
@@ -57,9 +55,9 @@ public class TronSnake extends GameRootPane {
 
     public TronSnake() {
         super("tron_snake", "null-pointer.ttf", "eBeat.wav", 100, 5);
-        initMenu(20, 12, Color.WHITE, Color.BLACK, "eBeat.wav", "TRON Snake");
-        firstPlayerScore = new Score(this, 11, Color.WHITE, Color.GRAY, Pos.TOP_LEFT);
-        secondPlayerScore = new Score(this, 11, Color.WHITE, Color.GRAY, Pos.TOP_RIGHT);
+        initMenu(40, 30, Color.WHITE, Color.BLACK, "eBeat.wav", "TRON Snake");
+        firstPlayerScore = new Score(this, 30, Color.WHITE, Color.GRAY, Pos.TOP_LEFT);
+        secondPlayerScore = new Score(this, 30, Color.WHITE, Color.GRAY, Pos.TOP_RIGHT);
     }
 
     protected void onGameStart() {
@@ -79,156 +77,65 @@ public class TronSnake extends GameRootPane {
 
         // render the snake heads
         for(SegmentCoordinateWrapper s : firstPlayerSnake) {
-            addSprite(s.getSegment(), s.getCurrentCoordinate().x, s.getCurrentCoordinate().y);
+            addSprite(s.segment, s.getCurrentCoordinate().x, s.getCurrentCoordinate().y);
         }
         for(SegmentCoordinateWrapper s: secondPlayerSnake) {
-            addSprite(s.getSegment(), s.getCurrentCoordinate().x, s.getCurrentCoordinate().y);
+            addSprite(s.segment, s.getCurrentCoordinate().x, s.getCurrentCoordinate().y);
         }
 
         // bind keys
-        addKeyBinding(new KeyAction() {
-            @Override
-            public KeyCode getKey() {
-                return KeyCode.W;
-            }
-
-            @Override
-            public boolean fireOnce() {
-                return false;
-            }
-
-            @Override
-            public void action() {
-                firstPlayerDirection = Direction.UP;
-            }
-        });
-        addKeyBinding(new KeyAction() {
-            @Override
-            public KeyCode getKey() {
-                return KeyCode.A;
-            }
-
-            @Override
-            public boolean fireOnce() {
-                return false;
-            }
-
-            @Override
-            public void action() {
-                firstPlayerDirection = Direction.LEFT;
-            }
-        });
-        addKeyBinding(new KeyAction() {
-            @Override
-            public KeyCode getKey() {
-                return KeyCode.S;
-            }
-
-            @Override
-            public boolean fireOnce() {
-                return false;
-            }
-
-            @Override
-            public void action() {
-                firstPlayerDirection = Direction.DOWN;
-            }
-        });
-        addKeyBinding(new KeyAction() {
-            @Override
-            public KeyCode getKey() {
-                return KeyCode.D;
-            }
-
-            @Override
-            public boolean fireOnce() {
-                return false;
-            }
-
-            @Override
-            public void action() {
-                firstPlayerDirection = Direction.RIGHT;
+        this.getScene().setOnKeyPressed( event -> {
+            switch (event.getCode()) {
+                default:
+                    return;
+                case W:
+                    firstPlayerDirection = Direction.UP;
+                    break;
+                case A:
+                    firstPlayerDirection = Direction.LEFT;
+                    break;
+                case S:
+                    firstPlayerDirection = Direction.DOWN;
+                    break;
+                case D:
+                    firstPlayerDirection = Direction.RIGHT;
+                    break;
+                case UP:
+                    secondPlayerDirection = Direction.UP;
+                    break;
+                case LEFT:
+                    secondPlayerDirection = Direction.LEFT;
+                    break;
+                case DOWN:
+                    secondPlayerDirection = Direction.DOWN;
+                    break;
+                case RIGHT:
+                    secondPlayerDirection = Direction.RIGHT;
+                    break;
             }
         });
 
-        // second player bindings
-        addKeyBinding(new KeyAction() {
-            @Override
-            public KeyCode getKey() {
-                return KeyCode.UP;
-            }
-
-            @Override
-            public boolean fireOnce() {
-                return false;
-            }
-
-            @Override
-            public void action() {
-                secondPlayerDirection = Direction.UP;
-            }
-        });
-        addKeyBinding(new KeyAction() {
-            @Override
-            public KeyCode getKey() {
-                return KeyCode.LEFT;
-            }
-
-            @Override
-            public boolean fireOnce() {
-                return false;
-            }
-
-            @Override
-            public void action() {
-                secondPlayerDirection = Direction.LEFT;
-            }
-        });
-        addKeyBinding(new KeyAction() {
-            @Override
-            public KeyCode getKey() {
-                return KeyCode.DOWN;
-            }
-
-            @Override
-            public boolean fireOnce() {
-                return false;
-            }
-
-            @Override
-            public void action() {
-                secondPlayerDirection = Direction.DOWN;
-            }
-        });
-        addKeyBinding(new KeyAction() {
-            @Override
-            public KeyCode getKey() {
-                return KeyCode.RIGHT;
-            }
-
-            @Override
-            public boolean fireOnce() {
-                return false;
-            }
-
-            @Override
-            public void action() {
-                secondPlayerDirection = Direction.RIGHT;
-            }
-        });
 
     }
 
     protected void update() {
         // spawn cookies until 2 are in the field
-        while(cookieStack.size() <= 2) {
+        while(cookieStack.size() < 2) {
             Coordinate randomCoord = randomCoordinate();
             SnakeSegment newCookie = new SnakeSegment("cookie");
             addSprite(newCookie, randomCoord.x, randomCoord.y);
-            if (!newCookie.collided("firstPlayerSnakeHead") && !newCookie.collided("firstPlayerSnakeBody")
-                    && !newCookie.collided("secondPlayerSnakeHead") &&
-                    !newCookie.collided("secondPlayerSnakeBody")) {
+            if (!newCookie.collided("firstPlayerSnakeHead") && !newCookie.collided("secondPlayerSnakeHead")) {
                 cookieStack.add(newCookie);
+            }
+            else if(firstPlayerSnake.size() > 1) {
+                if(!newCookie.collided("firstPlayerSnakeBody")) {
+                    cookieStack.add(newCookie);
+                }
+            }
+            else if(secondPlayerSnake.size() > 1) {
+                if(!newCookie.collided("secondPlayerSnakeBody")) {
+                    cookieStack.add(newCookie);
+                }
             }
             else {
                 removeSprite(newCookie);
@@ -240,47 +147,55 @@ public class TronSnake extends GameRootPane {
 
         updateSnake(firstPlayerDirection, secondPlayerDirection);
 
-        if(firstPlayerSnake.get(0).getSegment().collided("wall")) {
-            firstPlayerScore.removeFromScore(firstPlayerScore.getScore());
-            for(SegmentCoordinateWrapper s : firstPlayerSnake) removeSprite(s.getSegment());
-            firstPlayerSnake.clear();
-            firstPlayerSnake.add(new SegmentCoordinateWrapper("firstPlayerSnakeHead", new Coordinate(150, 300)));
-        }
-        if(secondPlayerSnake.get(0).getSegment().collided("wall")) {
-            secondPlayerScore.removeFromScore(secondPlayerScore.getScore());
-            for(SegmentCoordinateWrapper s : secondPlayerSnake) removeSprite(s.getSegment());
-            secondPlayerSnake.clear();
-            secondPlayerSnake.add(new SegmentCoordinateWrapper("secondPlayerSnakeHead", new Coordinate(450, 300)));
-        }
-
         for(SnakeSegment c : cookieStack) {
             if(c.collided("firstPlayerSnakeHead")) {
+                System.out.println("1Nom");
                 firstPlayerSnake.add(firstPlayerSnake.size() - 1,
                         new SegmentCoordinateWrapper("firstPlayerSnakeBody", firstPlayerSnakeTailCoordinate));
-                removeSprite(firstPlayerSnake.get(0).getSegment().getCollided("cookie"));
+                removeSprite(firstPlayerSnake.get(0).segment.getCollided("cookie"));
                 firstPlayerScore.addToScore(1);
             }
             else if(c.collided("secondPlayerSnakeHead")) {
+                System.out.println("2Nom");
                 secondPlayerSnake.add(secondPlayerSnake.size() - 1,
                         new SegmentCoordinateWrapper("secondPlayerSnakeBody", secondPlayerSnakeTailCoordinate));
-                removeSprite(secondPlayerSnake.get(0).getSegment().getCollided("cookie"));
+                removeSprite(secondPlayerSnake.get(0).segment.getCollided("cookie"));
                 secondPlayerScore.addToScore(1);
             }
         }
 
-        if(firstPlayerSnake.get(0).getSegment().collided("secondPlayerSnakeHead")
-                || firstPlayerSnake.get(0).getSegment().collided("secondPlayerSnakeBody")
-                || secondPlayerSnake.get(0).getSegment().collided("firstPlayerSnakeHead")
-                || secondPlayerSnake.get(0).getSegment().collided("firstPlayerSnakeBody")) {
+        if(firstPlayerSnake.get(0).segment.collided("wall")) {
             firstPlayerScore.removeFromScore(firstPlayerScore.getScore());
-            secondPlayerScore.removeFromScore(secondPlayerScore.getScore());
-            for(SegmentCoordinateWrapper s : firstPlayerSnake) removeSprite(s.getSegment());
+            for(SegmentCoordinateWrapper s : firstPlayerSnake) removeSprite(s.segment);
             firstPlayerSnake.clear();
             firstPlayerSnake.add(new SegmentCoordinateWrapper("firstPlayerSnakeHead", new Coordinate(150, 300)));
-            for(SegmentCoordinateWrapper s : secondPlayerSnake) removeSprite(s.getSegment());
+        }
+        if(secondPlayerSnake.get(0).segment.collided("wall")) {
+            secondPlayerScore.removeFromScore(secondPlayerScore.getScore());
+            for(SegmentCoordinateWrapper s : secondPlayerSnake) removeSprite(s.segment);
             secondPlayerSnake.clear();
             secondPlayerSnake.add(new SegmentCoordinateWrapper("secondPlayerSnakeHead", new Coordinate(450, 300)));
         }
+        try {
+            if (firstPlayerSnake.get(0).segment.collided("secondPlayerSnakeHead")
+                    || secondPlayerSnake.get(0).segment.collided("firstPlayerSnakeHead")) {
+                resetSnakes();
+            }
+        } catch(NullPointerException e) {
+            System.out.println(firstPlayerSnake.get(0).segment.getId());
+            System.out.println(secondPlayerSnake.get(0).segment.getId());
+        }
+        if(secondPlayerSnake.size() > 1) {
+            if(firstPlayerSnake.get(0).segment.collided("secondPlayerSnakeBody")) {
+                resetSnakes();
+            }
+        }
+        if(firstPlayerSnake.size() > 1) {
+            if(secondPlayerSnake.get(0).segment.collided("firstPlayerSnakeBody")) {
+                resetSnakes();
+            }
+        }
+
     }
 
     protected void onPause() {}
@@ -308,12 +223,15 @@ public class TronSnake extends GameRootPane {
                         new Coordinate(firstPlayerSnakeHeadCoordinate.x + 5, firstPlayerSnakeHeadCoordinate.y)));
                 break;
         }
-        firstPlayerSnake.set(1, new SegmentCoordinateWrapper("firstPlayerSnakeBody", firstPlayerSnakeHeadCoordinate));
-        removeSprite(firstPlayerSnake.get(firstPlayerSnake.size() - 1).getSegment());
+        removeSprite(firstPlayerSnake.get(firstPlayerSnake.size() - 1).segment);
         firstPlayerSnake.remove(firstPlayerSnake.size() - 1);
+        if(firstPlayerSnake.size() >= 2) {
+            firstPlayerSnake.set(1, new SegmentCoordinateWrapper("firstPlayerSnakeBody", firstPlayerSnakeHeadCoordinate));
+        }
+
 
         for(SegmentCoordinateWrapper s : firstPlayerSnake) {
-            addSprite(s.getSegment(), s.getCurrentCoordinate().x, s.getCurrentCoordinate().y);
+            addSprite(s.segment, s.getCurrentCoordinate().x, s.getCurrentCoordinate().y);
         }
 
         switch(d2) {
@@ -334,18 +252,32 @@ public class TronSnake extends GameRootPane {
                         new Coordinate(secondPlayerSnakeHeadCoordinate.x + 5, secondPlayerSnakeHeadCoordinate.y)));
                 break;
         }
-        secondPlayerSnake.set(1, new SegmentCoordinateWrapper("secondPlayerSnakeBody", secondPlayerSnakeHeadCoordinate));
-        removeSprite(secondPlayerSnake.get(secondPlayerSnake.size() - 1).getSegment());
+        removeSprite(secondPlayerSnake.get(secondPlayerSnake.size() - 1).segment);
         secondPlayerSnake.remove(secondPlayerSnake.size() - 1);
+        if(secondPlayerSnake.size() >= 2) {
+            secondPlayerSnake.set(1, new SegmentCoordinateWrapper("secondPlayerSnakeBody", secondPlayerSnakeHeadCoordinate));
+        }
+
 
         for(SegmentCoordinateWrapper s: secondPlayerSnake) {
-            addSprite(s.getSegment(), s.getCurrentCoordinate().x, s.getCurrentCoordinate().y);
+            addSprite(s.segment, s.getCurrentCoordinate().x, s.getCurrentCoordinate().y);
         }
     }
 
     private Coordinate randomCoordinate() {
         Random r = new Random();
         return new Coordinate(r.nextInt(120) * 5, r.nextInt(120) * 5);
+    }
+
+    private void resetSnakes() {
+        firstPlayerScore.removeFromScore(firstPlayerScore.getScore());
+        secondPlayerScore.removeFromScore(secondPlayerScore.getScore());
+        for(SegmentCoordinateWrapper s : firstPlayerSnake) removeSprite(s.segment);
+        firstPlayerSnake.clear();
+        firstPlayerSnake.add(new SegmentCoordinateWrapper("firstPlayerSnakeHead", new Coordinate(150, 300)));
+        for(SegmentCoordinateWrapper s : secondPlayerSnake) removeSprite(s.segment);
+        secondPlayerSnake.clear();
+        secondPlayerSnake.add(new SegmentCoordinateWrapper("secondPlayerSnakeHead", new Coordinate(450, 300)));
     }
 
 }
