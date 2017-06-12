@@ -39,10 +39,10 @@ public class TronSnake extends GameRootPane {
         UP, DOWN, LEFT, RIGHT;
     }
 
-    private final PixelSprite leftWall = new PixelSprite(onePixel, 5, 590, "wall", Color.WHITE);
-    private final PixelSprite topWall = new PixelSprite(onePixel, 590, 5, "wall", Color.WHITE);
-    private final PixelSprite rightWall = new PixelSprite(onePixel, 5, 590, "wall", Color.WHITE);
-    private final PixelSprite bottomWall = new PixelSprite(onePixel, 590, 5, "wall", Color.WHITE);
+    //private final PixelSprite leftWall = new PixelSprite(onePixel, 5, 590, "wall", Color.WHITE);
+    //private final PixelSprite topWall = new PixelSprite(onePixel, 590, 5, "wall", Color.WHITE);
+    //private final PixelSprite rightWall = new PixelSprite(onePixel, 5, 590, "wall", Color.WHITE);
+    //private final PixelSprite bottomWall = new PixelSprite(onePixel, 590, 5, "wall", Color.WHITE);
 
     private final ArrayList<SegmentCoordinateWrapper> firstPlayerSnake = new ArrayList<>();
     private final ArrayList<SegmentCoordinateWrapper> secondPlayerSnake = new ArrayList<>();
@@ -56,8 +56,8 @@ public class TronSnake extends GameRootPane {
     public TronSnake() {
         super("tron_snake", "null-pointer.ttf", "eBeat.wav", 100, 5);
         initMenu(40, 30, Color.WHITE, Color.BLACK, "eBeat.wav", "TRON Snake");
-        firstPlayerScore = new Score(this, 30, Color.WHITE, Color.GRAY, Pos.TOP_LEFT);
-        secondPlayerScore = new Score(this, 30, Color.WHITE, Color.GRAY, Pos.TOP_RIGHT);
+        firstPlayerScore = new Score(this, "Player 1: ", 30, Color.WHITE, Color.GRAY, Pos.TOP_LEFT);
+        secondPlayerScore = new Score(this, "Player 2: ", 30, Color.WHITE, Color.GRAY, Pos.TOP_RIGHT);
     }
 
     protected void onGameStart() {
@@ -104,6 +104,9 @@ public class TronSnake extends GameRootPane {
                 case RIGHT:
                     secondPlayerDirection = Direction.RIGHT;
                     break;
+                case ESCAPE: 
+                	togglePause();
+                	break;
             }
         });
 
