@@ -41,8 +41,8 @@ public class GameListMenu extends Menu {
 		
 		/**ADD YOUR GAME HERE**/
 		addGame (new Curveball());
-		addGame (new SpaceInvaders());
 		addGame (new TronSnake());
+		addGame (new SpaceInvaders());
 		/**ADD YOUR GAME HERE**/
 	}
 	

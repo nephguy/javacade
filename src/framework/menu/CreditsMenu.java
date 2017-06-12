@@ -37,8 +37,8 @@ public class CreditsMenu extends Menu{
 		
 		/**ADD YOUR CREDIT HERE**/
 		addCredit("Curveball","Nick Hansen");
-		addCredit("Space Invaders","Lovejit Kharod");
 		addCredit("Tron Snake","Benjamin Zhang");
+		addCredit("Space Invaders","Lovejit Kharod");
 		//addCredit("4-D Tetris","Nick Hansen");
 		
 		

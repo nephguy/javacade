@@ -113,8 +113,9 @@ public class TronSnake extends GameRootPane {
                 case RIGHT:
                     secondPlayerDirection = Direction.RIGHT;
                     break;
-                case ESCAPE:
-                    super.togglePause();
+                case ESCAPE: 
+                	togglePause();
+                	break;
             }
         });
 

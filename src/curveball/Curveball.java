@@ -49,7 +49,7 @@ public class Curveball extends GameRootPane {
 	double startingRate = 1500;
 	Color bgStrokeColor = Color.GREEN;
 	int numBgBoxes = 8;
-	double difficulty = 0.75;
+	double difficulty = 1;
 	int numLives = 3;
 	
 	// play objects
