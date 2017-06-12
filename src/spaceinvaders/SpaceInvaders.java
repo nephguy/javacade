@@ -10,6 +10,7 @@ public class SpaceInvaders extends GameRootPane {
 	
 	PixelSprite ship;
 	PixelSprite bullet;
+	PixelSprite invader0;
 	PixelSprite invader1;
 	PixelSprite invader2;
 	PixelSprite wallLeft;
@@ -25,6 +26,7 @@ public class SpaceInvaders extends GameRootPane {
 	boolean movingDown = false;
 	
 	Score score;
+	ArrayList<PixelSprite> listInv0 = new ArrayList<PixelSprite>();
 	ArrayList<PixelSprite> listInv1 = new ArrayList<PixelSprite>();
 	ArrayList<PixelSprite> listInv2 = new ArrayList<PixelSprite>();
 	
@@ -36,7 +38,7 @@ public class SpaceInvaders extends GameRootPane {
 	
 	public SpaceInvaders ()
 	{
-		super("Space\nInvaders","press-start.ttf","SpaceInvadersTheme.mp3",50,20);
+		super("Space\nInvaders","press-start.ttf","Distance.wav",50,20);
 		
 		initMenu(50,30,Color.WHITE, Color.BLACK, "SpaceInvadersTheme.mp3","Kill the aliens\nA/D - Movement\nW - Fire");
 		
@@ -78,10 +80,11 @@ public class SpaceInvaders extends GameRootPane {
 	}
 
 	public void onGameStart() {
+		listInv0.clear();
 		listInv1.clear();
 		listInv2.clear();
 		shipPosX = 300;
-		invadersLeft = 16;
+		invadersLeft = 24;
 		setBackground(Color.BLACK);
 		score = new Score(this, 20, Color.WHITE, Color.TRANSPARENT, Pos.TOP_CENTER);
 		// Sprite Arrays
@@ -90,16 +93,8 @@ public class SpaceInvaders extends GameRootPane {
 										  {0,0,0,0,0,1,1,1,0,0,0,0,0},
 										  {0,0,0,0,0,1,1,1,0,0,0,0,0},
 										  {0,1,1,1,1,1,1,1,1,1,1,1,0},
-										  {1,1,1,1,1,1,1,1,1,1,1,1,1}};		
-		int[][] spriteInvader2 = new int [][]{{0,0,1,0,0,0,0,0,1,0,0},
-											  {0,0,0,1,0,0,0,1,0,0,0},
-											  {0,0,1,1,1,1,1,1,1,0,0},
-											  {0,1,1,0,1,1,1,0,1,1,0},
-											  {1,1,1,1,1,1,1,1,1,1,1},
-											  {1,0,1,1,1,1,1,1,1,0,1},
-											  {1,0,1,0,0,0,0,0,1,0,1},
-											  {0,0,0,1,1,0,1,1,0,0,0}};		
-		int[][] spriteInvader1 = new int [][]{{0,0,0,1,1,0,0,0},
+										  {1,1,1,1,1,1,1,1,1,1,1,1,1}};
+		int[][] spriteInvader0 = new int [][]{{0,0,0,1,1,0,0,0},
 											  {0,0,1,1,1,1,0,0},
 											  {0,1,1,1,1,1,1,0},
 											  {1,1,0,1,1,0,1,1},
@@ -107,6 +102,22 @@ public class SpaceInvaders extends GameRootPane {
 											  {0,0,1,0,0,1,0,0},
 											  {0,1,0,1,1,0,1,0},
 											  {1,0,1,0,0,1,0,1}};
+		int[][] spriteInvader1 = new int [][]{{0,0,1,0,0,0,0,0,1,0,0},
+											  {0,0,0,1,0,0,0,1,0,0,0},
+											  {0,0,1,1,1,1,1,1,1,0,0},
+											  {0,1,1,0,1,1,1,0,1,1,0},
+											  {1,1,1,1,1,1,1,1,1,1,1},
+											  {1,0,1,1,1,1,1,1,1,0,1},
+											  {1,0,1,0,0,0,0,0,1,0,1},
+											  {0,0,0,1,1,0,1,1,0,0,0}};		
+		int[][] spriteInvader2 = new int [][]{{0,0,0,0,1,1,1,1,0,0,0,0},
+											  {0,1,1,1,1,1,1,1,1,1,1,0},
+											  {1,1,1,1,1,1,1,1,1,1,1,1},
+											  {1,1,1,0,0,1,1,0,0,1,1,1},
+											  {1,1,1,1,1,1,1,1,1,1,1,1},
+											  {0,0,0,1,1,0,0,1,1,0,0,0},
+											  {0,0,1,1,0,1,1,0,1,1,0,0},
+											  {1,1,0,0,0,0,0,0,0,0,1,1}};
 		int[][] spriteWall = new int [][]{{1}};
 		// Sprite Creation
 		ship = new PixelSprite(spriteShip, 50, 50, Color.WHITE);
@@ -122,20 +133,31 @@ public class SpaceInvaders extends GameRootPane {
 		addSprite(wallBottom,300,525);
 		// Invader Sprite Creation As ArrayList
 		for (int initList = 0; initList < 8; initList++) {
+			listInv0.add(new PixelSprite(spriteInvader0,50,50,"enemy",Color.WHITE));
 			listInv1.add(new PixelSprite(spriteInvader1,50,50,"enemy",Color.WHITE));
 			listInv2.add(new PixelSprite(spriteInvader2,50,50,"enemy",Color.WHITE));
 		}
 		// Add Invaders To Scene From ArrayList
 		listNum = 0;
 		for (int x = 40; x <= 550; x += 65)	{
-			addSprite(listInv1.get(listNum), x, 100);
-			addSprite(listInv2.get(listNum), x, 175);
+			addSprite(listInv0.get(listNum), x, 100);
+			addSprite(listInv1.get(listNum), x, 175);
+			addSprite(listInv2.get(listNum), x, 250);
 			listNum++;
 		}
 	}
 	
 	public void update() {
 		// Invader Movement Checks
+		listInv0.forEach(inv -> {
+			if (inv.collided(wallRight)) {
+				movingRight = false;
+				movingDown = true;
+			} else if (inv.collided(wallLeft)) {
+				movingRight = true;
+				movingDown = true;
+			}
+		});
 		listInv1.forEach(inv -> {
 			if (inv.collided(wallRight)) {
 				movingRight = false;
@@ -155,6 +177,14 @@ public class SpaceInvaders extends GameRootPane {
 			}
 		});
 		// Actual Movement Based On Checks
+		listInv0.forEach(inv -> {
+			if (movingDown)
+				inv.translate(0, 20);
+			if (movingRight)
+				inv.translate(2, 0);
+			else
+				inv.translate(-2, 0);
+		});
 		listInv1.forEach(inv -> {
 			if (movingDown)
 				inv.translate(0, 20);
@@ -191,13 +221,17 @@ public class SpaceInvaders extends GameRootPane {
 			listNum = 0;
 			for (int x = 40; x <= 550; x += 65)
 			{
-				addSprite(listInv1.get(listNum), x, 100);
-				addSprite(listInv2.get(listNum), x, 175);
+				addSprite(listInv0.get(listNum), x, 100);
+				addSprite(listInv1.get(listNum), x, 175);
+				addSprite(listInv2.get(listNum), x, 250);
 				listNum++;
 			}
-			invadersLeft = 16;
+			invadersLeft = 24;
 		} else if (wallBottom.collided("enemy")) { // Player Loses, Game Over
 			removeSprite(ship);
+			listInv0.forEach(inv -> {
+				removeSprite(inv);
+			});
 			listInv1.forEach(inv -> {
 				removeSprite(inv);
 			});
