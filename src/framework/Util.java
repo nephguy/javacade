@@ -92,7 +92,7 @@ public class Util {
 	
 	public static ImageView getImage (String gamePackageName, String imageFileName) {
 		try {
-			return new ImageView (Main.class.getResource("/" + gamePackageName + "/sfx/" + imageFileName).toString());
+			return new ImageView (Main.class.getResource("/" + gamePackageName + "/" + imageFileName).toString());
 		} catch (NullPointerException e) {
 			return new ImageView (Main.class.getResource("/framework/defaultImage.png").toString());
 		}

@@ -6,8 +6,8 @@ import javafx.scene.paint.Paint;
 
 public class Ball extends PixelSprite{
 
-	public Ball () {
-		super(PixelSprite.parseSprite("curveball", "ball.txt", 16, 16),16*4.5,16*4.5,"ball",Color.DARKORANGE,Color.ORANGE,Color.GOLD);
+	public Ball (double scale) {
+		super(PixelSprite.parseSprite("curveball", "ball.txt", 16, 16),16*scale,16*scale,"ball",Color.DARKORANGE,Color.ORANGE,Color.GOLD);
 	}
 	
 	public void crashed () {

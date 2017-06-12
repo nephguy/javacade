@@ -18,7 +18,7 @@ public class Score extends Label{
 	private double score;
 	private double scoreBeforeDisabled;
 	private boolean disabled;
-	private String modifier;
+	private String prefix;
 	
 	/** A simpler constructor. Same as the other, but with the colors set to default values
 	 *  <pre><code>
@@ -34,8 +34,8 @@ public class Score extends Label{
 		this(parent,fontSize,Color.BLACK,Color.TRANSPARENT,position);
 	}
 	
-	public Score (GameRootPane parent, String labelModifier, double fontSize, Pos position) {
-		this(parent,labelModifier,fontSize,Color.BLACK,Color.TRANSPARENT,position);
+	public Score (GameRootPane parent, String labelPrefix, double fontSize, Pos position) {
+		this(parent,labelPrefix,fontSize,Color.BLACK,Color.TRANSPARENT,position);
 	}
 	
 	/** The score object is a label containing and displaying score within your game.
@@ -52,19 +52,19 @@ public class Score extends Label{
 		setEffect(new DropShadow(BlurType.ONE_PASS_BOX,dropShadowColor,1,1,5,5));
 		setTextFill(fontColor);
 		this.setPadding(new Insets(20));
-		modifier = "";
+		prefix = "Score: ";
 		StackPane.setAlignment(this, position);
 		updateScore();
 		disabled = false;
 		parent.addPaneAbove(this);
 	}
 	
-	public Score (GameRootPane parent, String labelModifier, double fontSize, Paint fontColor, Color dropShadowColor, Pos position) {
+	public Score (GameRootPane parent, String labelPrefix, double fontSize, Paint fontColor, Color dropShadowColor, Pos position) {
 		setFont(Util.getFont(parent.getFont(), fontSize));
 		setEffect(new DropShadow(BlurType.ONE_PASS_BOX,dropShadowColor,1,1,5,5));
 		setTextFill(fontColor);
 		this.setPadding(new Insets(20));
-		modifier = labelModifier + " ";
+		prefix = labelPrefix;
 		StackPane.setAlignment(this, position);
 		updateScore();
 		disabled = false;
@@ -90,7 +90,7 @@ public class Score extends Label{
 	
 	
 	private void updateScore () {
-		this.setText(modifier + "Score: " + (int)score);
+		this.setText(prefix + (int)score);
 	}
 	
 	/**Adds the double passed to the score and updates the score counter.**/

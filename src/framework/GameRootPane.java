@@ -66,7 +66,7 @@ public abstract class GameRootPane extends StackPane {
 	protected StackPane spritePane;
 	protected boolean paused;
 	PauseScreen pauseScreen;
-	String font;
+	public String font;
 	protected String packageName;
 	public MediaPlayer bgMusic;
 	
