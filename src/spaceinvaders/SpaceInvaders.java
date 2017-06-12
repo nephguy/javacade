@@ -136,7 +136,6 @@ public class SpaceInvaders extends GameRootPane {
 	}
 	
 	public void update() {
-		//wallBottom.collided("enemy")
 		System.out.println(listBullets);
 		listBullets.forEach(b -> {
 			b.translate(0, -20);
@@ -178,9 +177,6 @@ public class SpaceInvaders extends GameRootPane {
 		});
 		
 		listInv1.forEach(inv -> {
-			if (inv.collided(ship)) {
-				removeSprite(ship);
-			}
 			if (movingDown) {
 				inv.translate(0, 20);
 			}
@@ -191,10 +187,6 @@ public class SpaceInvaders extends GameRootPane {
 			}
 		});
 		listInv2.forEach(inv -> {
-			if (inv.collided(ship)) {
-				removeSprite(ship);
-				
-			}
 			if (movingDown) {
 				inv.translate(0, 20);
 			}
@@ -216,6 +208,7 @@ public class SpaceInvaders extends GameRootPane {
 			}
 			invadersLeft = 16;
 		} else if (wallBottom.collided("enemy")) {
+			removeSprite(ship);
 			listInv1.forEach(inv -> {
 				removeSprite(inv);
 			});
