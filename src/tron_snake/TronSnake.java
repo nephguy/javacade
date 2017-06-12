@@ -39,41 +39,50 @@ public class TronSnake extends GameRootPane {
         UP, DOWN, LEFT, RIGHT;
     }
 
-    private final PixelSprite leftWall = new PixelSprite(onePixel, 5, 590, "wall", Color.WHITE);
-    private final PixelSprite topWall = new PixelSprite(onePixel, 590, 5, "wall", Color.WHITE);
-    private final PixelSprite rightWall = new PixelSprite(onePixel, 5, 590, "wall", Color.WHITE);
-    private final PixelSprite bottomWall = new PixelSprite(onePixel, 590, 5, "wall", Color.WHITE);
-
     private final ArrayList<SegmentCoordinateWrapper> firstPlayerSnake = new ArrayList<>();
     private final ArrayList<SegmentCoordinateWrapper> secondPlayerSnake = new ArrayList<>();
     private final ArrayList<SnakeSegment> cookieStack = new ArrayList<>();
     private Direction firstPlayerDirection = Direction.RIGHT;
     private Direction secondPlayerDirection = Direction.LEFT;
 
-    private final Score firstPlayerScore;
-    private final Score secondPlayerScore;
+    private Score firstPlayerScore;
+    private Score secondPlayerScore;
 
     public TronSnake() {
-        super("tron_snake", "null-pointer.ttf", "eBeat.wav", 100, 5);
-        initMenu(40, 30, Color.WHITE, Color.BLACK, "eBeat.wav", "TRON Snake");
-        firstPlayerScore = new Score(this, 30, Color.WHITE, Color.GRAY, Pos.TOP_LEFT);
-        secondPlayerScore = new Score(this, 30, Color.WHITE, Color.GRAY, Pos.TOP_RIGHT);
+        super("tron_snake", "null-pointer.ttf", "eBeat.wav", 100, 10);
+        initMenu(40, 30, Color.WHITE, Color.BLACK, "eBeat.wav", "First Player: WASD\nSecond Player: Arrow Keys");
     }
 
     protected void onGameStart() {
         // screen 600 x 600
         setBackground(Color.BLACK);
+        firstPlayerScore = new Score(this, 30, Color.WHITE, Color.GRAY, Pos.TOP_LEFT);
+        secondPlayerScore = new Score(this, 30, Color.WHITE, Color.GRAY, Pos.TOP_RIGHT);
 
-        // insert walls
-        /*addSprite(leftWall, 5, 295);
-        addSprite(topWall, 295, 5);
-        addSprite(rightWall, 595, 295);
-        addSprite(bottomWall, 295, 595);*/
-
-        // first player snake
-        firstPlayerSnake.add(new SegmentCoordinateWrapper("firstPlayerSnakeHead", new Coordinate(150, 300)));
-        // second player snake
-        secondPlayerSnake.add(new SegmentCoordinateWrapper("secondPlayerSnakeHead", new Coordinate(450, 300)));
+        resetSnakes();
+        cookieStack.clear();
+        // spawn cookies until 5 are in the field
+        while(cookieStack.size() < 5) {
+            Coordinate randomCoord = randomCoordinate();
+            SnakeSegment newCookie = new SnakeSegment("cookie");
+            addSprite(newCookie, randomCoord.x, randomCoord.y);
+            if (!newCookie.collided("firstPlayerSnakeHead") && !newCookie.collided("secondPlayerSnakeHead")) {
+                cookieStack.add(newCookie);
+            }
+            else if(firstPlayerSnake.size() > 1) {
+                if(!newCookie.collided("firstPlayerSnakeBody")) {
+                    cookieStack.add(newCookie);
+                }
+            }
+            else if(secondPlayerSnake.size() > 1) {
+                if(!newCookie.collided("secondPlayerSnakeBody")) {
+                    cookieStack.add(newCookie);
+                }
+            }
+            else {
+                removeSprite(newCookie);
+            }
+        }
 
         // bind keys
         this.getScene().setOnKeyPressed( event -> {
@@ -104,6 +113,8 @@ public class TronSnake extends GameRootPane {
                 case RIGHT:
                     secondPlayerDirection = Direction.RIGHT;
                     break;
+                case ESCAPE:
+                    super.togglePause();
             }
         });
 
@@ -134,10 +145,6 @@ public class TronSnake extends GameRootPane {
             }
         }
 
-        //Coordinate firstPlayerSnakeTailCoordinate = firstPlayerSnake.get(firstPlayerSnake.size() - 1).currentCoordinate;
-        //Coordinate secondPlayerSnakeTailCoordinate = secondPlayerSnake.get(secondPlayerSnake.size() - 1).currentCoordinate;
-
-
         for(SnakeSegment c : cookieStack) {
             if(c.collided(firstPlayerSnake.get(0).segment)) {
                 removeSprite(c);
@@ -155,18 +162,6 @@ public class TronSnake extends GameRootPane {
 
         updateSnake(firstPlayerDirection, secondPlayerDirection);
 
-        /*if(firstPlayerSnake.get(0).segment.collided("wall")) {
-            firstPlayerScore.removeFromScore(firstPlayerScore.getScore());
-            for(SegmentCoordinateWrapper s : firstPlayerSnake) removeSprite(s.segment);
-            firstPlayerSnake.clear();
-            firstPlayerSnake.add(new SegmentCoordinateWrapper("firstPlayerSnakeHead", new Coordinate(150, 300)));
-        }
-        if(secondPlayerSnake.get(0).segment.collided("wall")) {
-            secondPlayerScore.removeFromScore(secondPlayerScore.getScore());
-            for(SegmentCoordinateWrapper s : secondPlayerSnake) removeSprite(s.segment);
-            secondPlayerSnake.clear();
-            secondPlayerSnake.add(new SegmentCoordinateWrapper("secondPlayerSnakeHead", new Coordinate(450, 300)));
-        }*/
         for(SegmentCoordinateWrapper s : firstPlayerSnake) {
             if(secondPlayerSnake.get(0).segment.collided(s.segment)) resetSnakes();
         }
