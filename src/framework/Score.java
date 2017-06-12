@@ -18,6 +18,7 @@ public class Score extends Label{
 	private double score;
 	private double scoreBeforeDisabled;
 	private boolean disabled;
+	private String modifier;
 	
 	/** A simpler constructor. Same as the other, but with the colors set to default values
 	 *  <pre><code>
@@ -31,6 +32,10 @@ public class Score extends Label{
 	 */
 	public Score (GameRootPane parent, double fontSize, Pos position) {
 		this(parent,fontSize,Color.BLACK,Color.TRANSPARENT,position);
+	}
+	
+	public Score (GameRootPane parent, String labelModifier, double fontSize, Pos position) {
+		this(parent,labelModifier,fontSize,Color.BLACK,Color.TRANSPARENT,position);
 	}
 	
 	/** The score object is a label containing and displaying score within your game.
@@ -47,6 +52,19 @@ public class Score extends Label{
 		setEffect(new DropShadow(BlurType.ONE_PASS_BOX,dropShadowColor,1,1,5,5));
 		setTextFill(fontColor);
 		this.setPadding(new Insets(20));
+		modifier = "";
+		StackPane.setAlignment(this, position);
+		updateScore();
+		disabled = false;
+		parent.addPaneAbove(this);
+	}
+	
+	public Score (GameRootPane parent, String labelModifier, double fontSize, Paint fontColor, Color dropShadowColor, Pos position) {
+		setFont(Util.getFont(parent.getFont(), fontSize));
+		setEffect(new DropShadow(BlurType.ONE_PASS_BOX,dropShadowColor,1,1,5,5));
+		setTextFill(fontColor);
+		this.setPadding(new Insets(20));
+		modifier = labelModifier + " ";
 		StackPane.setAlignment(this, position);
 		updateScore();
 		disabled = false;
@@ -72,7 +90,7 @@ public class Score extends Label{
 	
 	
 	private void updateScore () {
-		this.setText("Score: " + (int)score);
+		this.setText(modifier + "Score: " + (int)score);
 	}
 	
 	/**Adds the double passed to the score and updates the score counter.**/
