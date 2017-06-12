@@ -23,10 +23,8 @@ public class SpaceInvaders extends GameRootPane {
 	boolean movingRight = true;
 	boolean bulletExists = false;
 	boolean movingDown = false;
-	boolean bulletImpacted = false;
 	
 	Score score;
-	ArrayList<PixelSprite> listBullets = new ArrayList<PixelSprite>();
 	ArrayList<PixelSprite> listInv1 = new ArrayList<PixelSprite>();
 	ArrayList<PixelSprite> listInv2 = new ArrayList<PixelSprite>();
 	
@@ -80,6 +78,8 @@ public class SpaceInvaders extends GameRootPane {
 	}
 
 	public void onGameStart() {
+		listInv1.clear();
+		listInv2.clear();
 		shipPosX = 300;
 		invadersLeft = 16;
 		setBackground(Color.BLACK);
@@ -175,7 +175,7 @@ public class SpaceInvaders extends GameRootPane {
 		// Bullet Impact Check And Kill
 		if (bulletExists) {
 			bullet.translate(0, -20);
-			if ((!listInv1.isEmpty() || !listInv1.isEmpty()) && bullet.collided("enemy")) {
+			if (bullet.collided("enemy")) {
 				removeSprite(bullet.getCollided("enemy"));
 				removeSprite(bullet);
 				score.addToScore(10);
