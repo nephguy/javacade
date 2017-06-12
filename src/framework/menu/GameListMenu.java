@@ -41,8 +41,8 @@ public class GameListMenu extends Menu {
 		
 		/**ADD YOUR GAME HERE**/
 		addGame (new Curveball());
-		//addGame (new SpaceInvaders());
-		//addGame (new TronSnake());
+		addGame (new SpaceInvaders());
+		addGame (new TronSnake());
 		/**ADD YOUR GAME HERE**/
 	}
 	
@@ -62,7 +62,7 @@ public class GameListMenu extends Menu {
 		gameButton.setOnMouseClicked(event -> {
 			this.getScene().setRoot(game);
 			parent.bgMusic.stop();
-			game.bgMusic.play();
+			if (game.bgMusic != null) game.bgMusic.play();
 		});
 		
 		games.getChildren().add(gameButton);

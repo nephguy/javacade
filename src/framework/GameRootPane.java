@@ -439,10 +439,12 @@ public abstract class GameRootPane extends StackPane {
 	}
 	
 	public void restart () {
-		gameLoop.stop();
 		disarm();
+		getChildren().clear();
 		spritePane.getChildren().clear();
+		getChildren().add(spritePane);
 		setBgMusic(backgroundMusicFileName, musicVolume, true);
+		paused = false;
 		arm();
 		onGameStart();
 		gameLoop.play();

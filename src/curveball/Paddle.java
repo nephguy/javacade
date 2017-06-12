@@ -17,6 +17,13 @@ public class Paddle extends PixelSprite {
 		this.setSpriteBounds(lowBoundX, highBoundX, lowBoundY, highBoundY);
 	}
 	
+	/**For hitbox*/
+	public Paddle (double scale, double lowBoundX, double highBoundX, double lowBoundY, double highBoundY) {
+		super(PixelSprite.parseSprite("curveball", "paddle.txt", 45, 29),45*scale,29*scale,"paddle",
+				Color.TRANSPARENT,Color.TRANSPARENT,Color.TRANSPARENT);
+		this.setSpriteBounds(lowBoundX, highBoundX, lowBoundY, highBoundY);
+	}
+	
 	public void flash () {
 		Path p = (Path)this.getChildren().get(1);
 		Color defaultFill = (Color)p.getFill();

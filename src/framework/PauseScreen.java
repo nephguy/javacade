@@ -45,7 +45,6 @@ public class PauseScreen extends Pane {
 		});
 		restart = Util.styleLabel(font,20,true,"Restart");
 		restart.setOnMouseClicked(event -> {
-			parentGame.removePane(this);
 			parentGame.restart();
 		});
 		exit = Util.styleLabel(font,20,true,"Exit Game");

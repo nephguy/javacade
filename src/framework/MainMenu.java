@@ -101,8 +101,7 @@ public class MainMenu extends StackPane{
 	    // init bg music
 		Duration noIntroStart = Duration.millis(16982);
 		bgMusic = new MediaPlayer(new Media(this.getClass().getResource("/framework/mainmenu_bg_music.wav").toString()));
-		bgMusic.setVolume(0);
-		//TODO - REENABLE MUSIC
+		bgMusic.setVolume(1);
 		bgMusic.setOnEndOfMedia(() -> {
 	    	bgMusic.seek(noIntroStart);
 	    	bgMusic.play();

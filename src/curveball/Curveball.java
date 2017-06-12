@@ -6,22 +6,27 @@ import java.awt.Robot;
 
 import framework.*;
 import javafx.scene.Cursor;
-import javafx.scene.input.KeyCode;
+import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.HLineTo;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.VLineTo;
-import javafx.scene.shape.Line;
-import javafx.geometry.Bounds;
-import javafx.geometry.Pos;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.util.Duration;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.animation.Animation.Status;
 import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
 import javafx.event.ActionEvent;
 
 /**
@@ -30,30 +35,45 @@ import javafx.event.ActionEvent;
 
 public class Curveball extends GameRootPane {
 	
-	Paddle playerPaddle;
-	Paddle enemyPaddle;
-	StackPane ballPane;
-	Ball ball;
-	Rectangle topBallColl;
-	Rectangle bottomBallColl;
-	Rectangle rightBallColl;
-	Rectangle leftBallColl;
-	
-	// 
+	// parameters of the game, used to make the game easy to changes
 	private double verticalInset = 75;
 	private double horizontalInset = 10;
 	private double scaleDown = 4;
+	double startingRate = 2000;
+	Color bgStrokeColor = Color.GREEN;
+	int numBgBoxes = 8;
+	int difficulty = 1;
 	
+	// play objects
+	Paddle playerPaddle;
+	Paddle enemyPaddle;
+	Paddle enemyPaddleHitbox;
+	Ball ball;
+	StackPane ballPane;
+	Timeline scaleBallPane;
+	
+	
+	// for player paddle
 	double deltaX;
 	double deltaY;
 	double ballPathX;
 	double ballPathY;
-	
 	Robot mouseMover;
 	double absCenterX;
 	double absCenterY;
 	boolean firedByRobot = true;
+	int mouseMovedCounter;
 	
+	// for enemy paddle
+	double enemyDeltaX;
+	double enemyDeltaY;
+	double ballX;
+	double ballY;
+	double enemyPaddleX;
+	double enemyPaddleY;
+	boolean ballCrashed;
+	
+	// for score
 	int bounceCount;
 	
 	public Curveball () {
@@ -63,20 +83,21 @@ public class Curveball extends GameRootPane {
 		
 		try {
 			mouseMover = new Robot();
-		} catch (AWTException e) {}
-		
+		} catch (AWTException e) {}	
 	}
 
 	public void onGameStart() {
-		// draw the background/aesthetic
-		//this.setCursor(Cursor.NONE);
-		this.setBackground(Color.BLACK);
 		
-		
-		
+		//general
+		bounceCount = 0;
+		ballCrashed = false;
+		setCursor(Cursor.NONE);
+		final double playAreaWidth = this.getWidth() - horizontalInset*2;
+		final double playAreaHeight = this.getWidth() - verticalInset*2;
 		
 		// move the paddle and restrict the mouse to the scene
-		this.setOnMouseMoved(event -> {
+		setOnMouseMoved(event -> {
+			mouseMovedCounter = 5;
 			if (!paused) {
 				absCenterX = MouseInfo.getPointerInfo().getLocation().getX() - event.getX() + this.getWidth()/2;
 				absCenterY = MouseInfo.getPointerInfo().getLocation().getY() - event.getY() + this.getHeight()/2;
@@ -93,86 +114,173 @@ public class Curveball extends GameRootPane {
 			}
 		});
 		
-		
-		// init collision boxes so the ball bounces
-		topBallColl = newBallColl(false);
-		bottomBallColl = newBallColl(false);
-		rightBallColl = newBallColl(true);
-		leftBallColl = newBallColl(true);
+		// init paddles and ball
 		ball = new Ball();
-		ballPane = new StackPane(topBallColl,bottomBallColl,rightBallColl,leftBallColl,ball);
-		StackPane.setAlignment(topBallColl, Pos.TOP_CENTER);
-		StackPane.setAlignment(bottomBallColl, Pos.BOTTOM_CENTER);
-		StackPane.setAlignment(rightBallColl, Pos.CENTER_RIGHT);
-		StackPane.setAlignment(leftBallColl, Pos.CENTER_LEFT);
+		ballPane = new StackPane(ball);
+		ballPane.setMinSize(this.getWidth()-horizontalInset*2, this.getHeight()-verticalInset*2);
+		ballPane.setMaxSize(this.getWidth()-horizontalInset*2, this.getHeight()-verticalInset*2);	
+		// dont bother reading these next five lines. they just work
+		final double minCorrection = (scaleDown-1)/2;
+		final double maxCorrection = (scaleDown-1)/2+1;
+		enemyPaddle = new Paddle(4.5/scaleDown, playAreaWidth/scaleDown*minCorrection+horizontalInset , playAreaWidth/scaleDown*maxCorrection+horizontalInset , playAreaHeight/scaleDown*minCorrection+verticalInset , playAreaHeight/scaleDown*maxCorrection+verticalInset,Color.RED);
+		enemyPaddleHitbox = new Paddle(4.5, horizontalInset , this.getWidth()-horizontalInset , verticalInset , this.getHeight()-verticalInset);
+		playerPaddle = new Paddle(4.5, horizontalInset , this.getWidth()-horizontalInset , verticalInset , this.getHeight()-verticalInset ,Color.BLUE);
+		addPaneBelow(ballPane);
+		addPaneBelow(enemyPaddle);
+		addPaneAbove(enemyPaddleHitbox);
+		addSprite(playerPaddle);
 		
+		// fired when the ball reaches either side
+		EventHandler<ActionEvent> bounceBallOffPaddle = event -> {
+			bounceBallOffPaddle();
+		};
 		
+		// gives the appearance of depth as the ball moves
+		scaleBallPane = new Timeline ();
+		scaleBallPane.getKeyFrames().add(new KeyFrame(Duration.millis(startingRate),bounceBallOffPaddle,new KeyValue(ballPane.scaleXProperty(),1/scaleDown)));
+		scaleBallPane.getKeyFrames().add(new KeyFrame(Duration.millis(startingRate),new KeyValue(ballPane.scaleYProperty(),1/scaleDown)));
+		scaleBallPane.getKeyFrames().add(new KeyFrame(Duration.millis(startingRate*2),bounceBallOffPaddle,new KeyValue(ballPane.scaleXProperty(),1)));
+		scaleBallPane.getKeyFrames().add(new KeyFrame(Duration.millis(startingRate*2),new KeyValue(ballPane.scaleYProperty(),1)));
+		scaleBallPane.setCycleCount(Animation.INDEFINITE);
 		
-		
-		enemyPaddle = new Paddle(4.5/scaleDown,0,0,0,0,Color.RED);
-		playerPaddle = new Paddle(4.5,horizontalInset,this.getWidth()-horizontalInset,verticalInset,this.getHeight()-verticalInset,Color.BLUE);
-		
-		 
-		EventHandler<ActionEvent> bounceBall = event -> {
-			bounceCount++;
-			if (bounceCount%2 == 0) { // player
-				if (!ball.getBoundsInParent().intersects(playerPaddle.getBoundsInParent())) ;//resetBall();
-				else {
+		//fires the ball at the start of the game
+		EventHandler<MouseEvent> initialHit = new EventHandler<MouseEvent>() {
+			public void handle (MouseEvent event) {
+				if (!paused && ballTouched(playerPaddle)) {
 					playerPaddle.flash();
-					ballPathX = deltaX;
-					ballPathY = deltaY;
-				}
-			}
-			else { // enemy
-				if (!ball.getBoundsInParent().intersects(enemyPaddle.getBoundsInParent())) ;//resetBall();
-				else {
-					enemyPaddle.flash();
+					bounceCount++;
+					if (deltaX != 0) ballPathX = deltaX/Math.abs(deltaX) * Math.sqrt(Math.abs(deltaX)); // the first term retains the sign,
+					if (deltaY != 0) ballPathY = deltaY/Math.abs(deltaY) * Math.sqrt(Math.abs(deltaY)); // the second term recudes the velocity
+					ballPane.setBorder(new Border(new BorderStroke(Color.WHITE,BorderStrokeStyle.SOLID,CornerRadii.EMPTY,new BorderWidths(2))));
+					scaleBallPane.play();
+					removeEventHandler(MouseEvent.MOUSE_PRESSED, this);
 				}
 			}
 		};
-		ball.scaleAnimation(1/scaleDown, 1000, true, true, bounceBall);
-		addPaneBelow(ballPane);
-		addPaneAbove(rightBallColl);
-		this.addSprite(enemyPaddle);
-		this.addSprite(playerPaddle);
+		addEventHandler(MouseEvent.MOUSE_PRESSED, initialHit);
+		
+		// draw the background
+		setBackground(Color.BLACK);
+		addBgRect(1,Color.TRANSPARENT);
+		for (int i = 0; i < numBgBoxes; i++) {
+			Color bgColor = Color.TRANSPARENT;
+			if (i == numBgBoxes-1) bgColor = Color.BLACK;
+			addBgRect(1/Math.sqrt(scaleDown*(scaleDown/numBgBoxes*(i+1))),bgColor);
+		}
+		Path bgX = new Path(new MoveTo(0,0),
+							new LineTo(playAreaWidth,playAreaHeight),
+							new MoveTo(playAreaWidth,0),
+							new LineTo(0,playAreaHeight));
+		bgX.setFill(Color.TRANSPARENT);
+		bgX.setStroke(bgStrokeColor);
+		bgX.setStrokeWidth(1);
+		addPaneBelow(bgX);
 		
 	}
 	
-	private Rectangle newBallColl (boolean vertical) {
-		Rectangle rect = new Rectangle(this.getWidth(),this.getHeight());
-		if (vertical) rect.setWidth(1);
-		else rect.setHeight(1);
-		rect.setStroke(Color.WHITE);
-		rect.setFill(Color.WHITE);
-		return rect;
-	}
-	
-	private void bounceBall () {
-		final boolean atRightBorder = ball.getTranslateX() + ball.getWidth()/2 >= ballPane.getWidth()/2;
-        final boolean atLeftBorder = ball.getTranslateX() - ball.getWidth()/2 <= -ballPane.getWidth()/2;
-        final boolean atBottomBorder = ball.getTranslateY() + ball.getHeight()/2 >= ballPane.getHeight()/2;
-        final boolean atTopBorder = ball.getTranslateY() - ball.getHeight()/2 <= -ballPane.getHeight()/2;
+	private void bounceBallOffWall () {
+		double ballRadius = ball.getWidth()*ballPane.getScaleX()/2;
+		double ballPaneWidth = ballPane.getWidth()*ballPane.getScaleX();
+		double ballPaneHeight = ballPane.getHeight()*ballPane.getScaleY();
+		double ballTranslateX = (ball.getTranslateX()+ballPathX)*ballPane.getScaleX();
+		double ballTranslateY = (ball.getTranslateY()+ballPathY)*ballPane.getScaleY();
+		final boolean atRightBorder = ballTranslateX + ballRadius >= ballPaneWidth/2;
+        final boolean atLeftBorder = ballTranslateX - ballRadius <= -ballPaneWidth/2;
+        final boolean atBottomBorder = ballTranslateY + ballRadius >= ballPaneHeight/2;
+        final boolean atTopBorder = ballTranslateY - ballRadius <= -ballPaneHeight/2;
 		if (atRightBorder || atLeftBorder)
 			ballPathX *= -1;
 		if (atTopBorder || atBottomBorder)
 			ballPathY *= -1;
 	}
 	
-	public void update() { 
-		bounceBall();
+	private void bounceBallOffPaddle() {
+		if (bounceCount%2 == 0) { // player
+			if (!ballTouched(playerPaddle)) ballCrashed();
+			else {
+				playerPaddle.flash();
+				if (deltaX != 0) ballPathX = deltaX/Math.abs(deltaX) * Math.sqrt(Math.abs(deltaX)); // the first term retains the sign,
+				if (deltaY != 0) ballPathY = deltaY/Math.abs(deltaY) * Math.sqrt(Math.abs(deltaY)); // the second term recudes the velocity
+				bounceCount++;
+			}
+		}
+		else { // enemy
+			if (!ballTouched(enemyPaddleHitbox)) ballCrashed();
+			else {
+				enemyPaddle.flash();
+				bounceCount++;
+			}
+		}
+	}
+	
+	private boolean ballTouched (Node node) {
+		final double ballMinX = ball.getBoundsInParent().getMinX() + horizontalInset;
+		final double ballMaxX = ball.getBoundsInParent().getMaxX() + horizontalInset;
+		final double ballMinY = ball.getBoundsInParent().getMinY() + verticalInset;
+		final double ballMaxY = ball.getBoundsInParent().getMaxY() + verticalInset;
+		Bounds nodeBounds = node.getBoundsInParent();
+		
+		final boolean minX = ballMinX > nodeBounds.getMinX() && ballMinX < nodeBounds.getMaxX();
+		final boolean maxX = ballMaxX > nodeBounds.getMinX() && ballMaxX < nodeBounds.getMaxX();
+		final boolean minY = ballMinY > nodeBounds.getMinY() && ballMinY < nodeBounds.getMaxY();
+		final boolean maxY = ballMaxY > nodeBounds.getMinY() && ballMaxY < nodeBounds.getMaxY();
+		
+		final boolean corner = (minX && minY) || (minX && maxY) || (maxX && minY) || (maxX && maxY);
+		final boolean edge = (minX && minY && maxY) || (maxX && minY && maxY) || (minY && minX && maxX) | (maxY && minX && maxX);
+		final boolean center = minX && minY && maxX && maxY;
+		
+		return corner || edge || center;
+	}
+	
+	private void addBgRect (double scale, Color bgColor) {
+		Rectangle bgRect = new Rectangle (this.getWidth() - horizontalInset*2,this.getWidth() - verticalInset*2);
+		bgRect.setStroke(bgStrokeColor);
+		bgRect.setStrokeWidth(2);
+		bgRect.setFill(bgColor);
+		bgRect.setScaleX(scale);
+		bgRect.setScaleY(scale);
+		addPaneBelow(bgRect);
+	}
+	
+	private double clampLessThan (double value, double maxVal) {
+		if (value > 0) return value > maxVal ? maxVal : value;
+		else if (value < 0) return value < -maxVal ? -maxVal : value;
+		else return value;
+	}
+	
+	public void update() {
+		if (mouseMovedCounter == 0) deltaX = deltaY = 0;	// fixes deltaX and deltaY having a nonzero value
+		else mouseMovedCounter--;							// when the paddle is stationary
+		bounceBallOffWall();
 		ball.translate(ballPathX, ballPathY);
+		
+		//translate enemy paddle
+		if (!ballCrashed) {
+			enemyPaddleX = enemyPaddleHitbox.getTranslateX() + this.getWidth()/2;
+			enemyPaddleY = enemyPaddleHitbox.getTranslateY() + this.getHeight()/2;
+			ballX = ball.getTranslateX() + this.getWidth()/2;
+			ballY = ball.getTranslateY() + this.getHeight()/2;
+			enemyDeltaX = clampLessThan(ballX - enemyPaddleX, difficulty);
+			enemyDeltaY = clampLessThan(ballY - enemyPaddleY, difficulty);
+			enemyPaddleHitbox.translate(enemyDeltaX, enemyDeltaY);
+			enemyPaddle.translate(enemyDeltaX/scaleDown, enemyDeltaY/scaleDown);
+		}
 	}
 	
 	public void onPause () {
 		this.setCursor(Cursor.DEFAULT);
+		if (scaleBallPane.getStatus() == Status.RUNNING) scaleBallPane.pause();
 	}
 	
 	public void onResume () {
 		this.setCursor(Cursor.NONE);
+		if (scaleBallPane.getStatus() == Status.PAUSED) scaleBallPane.play();
 	}
 	
-	private void resetBall () {
+	private void ballCrashed () {
 		ball.crashed();
+		ballCrashed = true;
+		scaleBallPane.stop();
 		ballPathX = ballPathY = 0;
 	}
 }
