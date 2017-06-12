@@ -15,11 +15,15 @@ import javafx.geometry.Insets;
 public class Tutorial extends BorderPane{
 
 	GameRootPane parentGame;
+	Color textColor;
 	
 	public Tutorial (GameRootPane parent, String tutorialText) {
 		parentGame = parent;
-		Label tutorial = Util.styleLabel(parentGame.getFont(), 10, Color.BLACK, Color.TRANSPARENT, false, true, tutorialText);
-		Label backToMenu = Util.styleLabel(parentGame.getFont(), 25, true, "Back to Game");
+		textColor = (Color)parent.getBackground().getFills().get(0).getFill();
+		textColor = Color.rgb(255-(int)textColor.getRed(), 255-(int)textColor.getGreen(), 255-(int)textColor.getBlue());
+		
+		Label tutorial = Util.styleLabel(parentGame.getFont(), 10, textColor, Color.TRANSPARENT, false, true, tutorialText);
+		Label backToMenu = Util.styleLabel(parentGame.getFont(), 25, textColor, Color.TRANSPARENT, true, false, "Back to Game");
 		backToMenu.setOnMouseClicked(event -> {
 			returnToGame();
 		});

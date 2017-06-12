@@ -88,8 +88,13 @@ public class Curveball extends GameRootPane {
 	
 	public Curveball () {
 		super("CURVEBALL","press-start.ttf","Derp 2 somewhat sped up.wav",35,144);
-		
-		initMenu(60, 20, Color.BLACK, Color.LIGHTSLATEGRAY, "Pong Intro.wav", "");
+		String tutorial = "Just like Pong, but 3-D!\n\n" +
+						  "Your mouse controls the paddle. To start the game, click the paddle on the ball. " +
+						  "Afterward, move the paddle over the ball to hit it. The ball curves based on the paddle's speed. " + 
+						  "Curve the ball past your opponent's paddle to earn points. " +
+						  "But beware, if you miss the ball, you lose a life.\n\n" + 
+						  "How many points can you score?";
+		initMenu(60, 20, Color.BLACK, Color.LIGHTSLATEGRAY, "Pong Intro.wav", tutorial);
 		
 		try {
 			mouseMover = new Robot();
