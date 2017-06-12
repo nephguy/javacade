@@ -99,8 +99,8 @@ public class MainMenu extends StackPane{
 	      appDataPath = System.getProperty("user.dir") + sep + folder;
 	    
 	    // init bg music
-		Duration noIntroStart = Duration.millis(16982);
-		bgMusic = new MediaPlayer(new Media(ClassLoader.getSystemResource("framework/One.wav").toExternalForm()));
+		Duration noIntroStart = Duration.millis(13475);
+		bgMusic = new MediaPlayer(new Media(ClassLoader.getSystemResource("framework/Distance.wav").toExternalForm()));
 		bgMusic.setVolume(1);
 		bgMusic.setOnEndOfMedia(() -> {
 	    	bgMusic.seek(noIntroStart);
@@ -138,25 +138,52 @@ public class MainMenu extends StackPane{
 		authors.translateYProperty().bind(title.translateYProperty().add(110));
 		date.translateYProperty().bind(title.translateYProperty().add(50));
 		welcome.translateYProperty().bind(title.translateYProperty().add(530));
+		welcome.opacityProperty().bind(blackScreen.opacityProperty());
+		welcome.visibleProperty().bind(blackScreen.visibleProperty());
+		Timeline titleTimeline = new Timeline(moveTo(title,3272,320),
+											  moveTo(title,6516,-70),
+											  moveTo(title,9751,-70),
+											  moveTo(title,13475,-530));
+		titleTimeline.play();
+		Timeline backgroundTimeline = new Timeline (opacity(blackScreen,0,100),
+													opacity(blackScreen,12664,100),
+													opacity(blackScreen,13475,0));
+													
+		backgroundTimeline.play();
+	}
+	private void firstLaunchFancinessFOR_SONG_ONE () {
+		Rectangle blackScreen = new Rectangle(600,600,Color.BLACK);
+		Label title = Util.styleLabel(font, 45, Color.WHITE, Color.TRANSPARENT, false, true, "APCS Project");
+		Label date = Util.styleLabel(font,18, Color.WHITE, Color.TRANSPARENT, false, true, "2017");
+		Label authors = Util.styleLabel(font, 18, Color.WHITE, Color.TRANSPARENT, false, true, "By:\nNick Hansen, Alvin Chu,\nJackson Chui, Benjamin Zhang,\nand Lovejit Kharod");
+		Label welcome = Util.styleLabel(font, 35, Color.WHITE, Color.TRANSPARENT, false, true, "Welcome To...");
+		this.getChildren().addAll(blackScreen,title,date,authors,welcome);
+		title.setTranslateY(320);
+		authors.translateYProperty().bind(title.translateYProperty().add(110));
+		date.translateYProperty().bind(title.translateYProperty().add(50));
+		welcome.translateYProperty().bind(title.translateYProperty().add(530));
 		welcome.visibleProperty().bind(blackScreen.visibleProperty());
 		Timeline titleTimeline = new Timeline(moveTo(title,4000,320),
 											  moveTo(title,7700,-70),
 											  moveTo(title,11000,-70),
 											  moveTo(title,16000,-530));
 		titleTimeline.play();
-		Timeline backgroundTimeline = new Timeline (vis(blackScreen,0,true),
-													vis(blackScreen,16900,false),
-													vis(blackScreen,17000,true),
-													vis(blackScreen,17100,false),
-													vis(blackScreen,17200,true),
-													vis(blackScreen,17300,false));
+		Timeline backgroundTimeline = new Timeline (visible(blackScreen,0,true),
+													visible(blackScreen,16900,false),
+													visible(blackScreen,17000,true),
+													visible(blackScreen,17100,false),
+													visible(blackScreen,17200,true),
+													visible(blackScreen,17300,false));
 		backgroundTimeline.play();
 	}
 	private KeyFrame moveTo (Node node, double durationInMs, double pos) {
 		return new KeyFrame (Duration.millis(durationInMs),new KeyValue(node.translateYProperty(),pos));
 	}
-	private KeyFrame vis (Node node, double durationInMs, boolean visible) {
+	private KeyFrame visible (Node node, double durationInMs, boolean visible) {
 		return new KeyFrame (Duration.millis(durationInMs),new KeyValue(node.visibleProperty(),visible));
+	}
+	private KeyFrame opacity (Node node, double durationInMs, double opacity) {
+		return new KeyFrame (Duration.millis(durationInMs),new KeyValue(node.opacityProperty(),opacity));
 	}
 	
 }

@@ -4,6 +4,7 @@ import framework.*;
 import java.util.ArrayList;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
+import javafx.util.Duration;
 import javafx.geometry.Pos;
 
 public class SpaceInvaders extends GameRootPane {
@@ -38,9 +39,9 @@ public class SpaceInvaders extends GameRootPane {
 	
 	public SpaceInvaders ()
 	{
-		super("Space\nInvaders","press-start.ttf","Distance.wav",50,20);
+		super("Space\nInvaders","press-start.ttf","One.wav",50,20);
 		
-		initMenu(50,30,Color.WHITE, Color.BLACK, "SpaceInvadersTheme.mp3","Kill the aliens\nA/D - Movement\nW - Fire");
+		initMenu(50,30,Color.WHITE, Color.BLACK, "One.wav","Kill the aliens\nA/D - Movement\nW - Fire");
 		
 		addKeyBinding(new KeyAction () {
 			public KeyCode getKey() {return KeyCode.W;}
@@ -80,6 +81,17 @@ public class SpaceInvaders extends GameRootPane {
 	}
 
 	public void onGameStart() {
+		// fix to bg music by nick
+		Duration noIntroStart = Duration.millis(17000);
+		bgMusic.stop();
+		bgMusic.setStartTime(noIntroStart);
+		bgMusic.play();
+		bgMusic.seek(noIntroStart);
+		bgMusic.setOnEndOfMedia(() -> {
+	    	bgMusic.seek(noIntroStart);
+	    	bgMusic.play();
+	    });
+		
 		listInv0.clear();
 		listInv1.clear();
 		listInv2.clear();

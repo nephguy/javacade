@@ -260,7 +260,6 @@ public class Curveball extends GameRootPane {
 		scaleBallPane.stop();
 		ballPathX = ballPathY = 0;
 		
-		
 		// reset game
 		Platform.runLater(() -> {
 			try {
