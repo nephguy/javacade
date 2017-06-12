@@ -231,7 +231,7 @@ public class TronSnake extends GameRootPane {
             removeSprite(s.segment);
         }
 
-        for(int i = 1; i < secondPlayerSnake.size(); i++) {
+        for(int i = secondPlayerSnake.size() - 1; i > 0; i--) {
             secondPlayerSnake.get(i).currentCoordinate = secondPlayerSnake.get(i - 1).currentCoordinate;
         }
         secondPlayerSnake.get(0).currentCoordinate = secondPlayerSnakeHeadCoordinate;
