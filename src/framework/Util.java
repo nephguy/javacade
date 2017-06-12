@@ -83,18 +83,18 @@ public class Util {
 	}
 	
 	public static Media getMusic (String gamePackageName, String musicFileName) {
-		return new Media(Main.class.getResource("/" + gamePackageName + "/music/" + musicFileName).toString());
+		return new Media(ClassLoader.getSystemResource(gamePackageName + "/music/" + musicFileName).toExternalForm());
 	}
 	
 	public static Media getSfx (String gamePackageName, String sfxFileName) {
-		return new Media(Main.class.getResource("/" + gamePackageName + "/sfx/" + sfxFileName).toString());
+		return new Media(ClassLoader.getSystemResource(gamePackageName + "/sfx/" + sfxFileName).toExternalForm());
 	}
 	
 	public static ImageView getImage (String gamePackageName, String imageFileName) {
 		try {
-			return new ImageView (Main.class.getResource("/" + gamePackageName + "/" + imageFileName).toString());
+			return new ImageView (ClassLoader.getSystemResource(gamePackageName + "/" + imageFileName).toExternalForm());
 		} catch (NullPointerException e) {
-			return new ImageView (Main.class.getResource("/framework/defaultImage.png").toString());
+			return new ImageView (ClassLoader.getSystemResource("framework/defaultImage.png").toExternalForm());
 		}
 	}
 	
