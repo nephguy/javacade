@@ -259,7 +259,7 @@ public abstract class GameRootPane extends StackPane {
 	/**This initializes the sound effect, and subsequently plays it.
 	 * <p>
 	 * @param volume MUST be between 0.0 and 100.0
-	 * @param musicFileName the exact file name, including type extension (.mp3, .wav, etc)**/
+	 * @param sfxFileName the exact file name, including type extension (.mp3, .wav, etc)**/
 	protected void playSfx (String sfxFileName, double volume) {
 		MediaPlayer sfx = new MediaPlayer(Util.getSfx(packageName, sfxFileName));
 		sfx.setVolume(volume/100);

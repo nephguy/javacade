@@ -42,8 +42,8 @@ public class TronSnake extends GameRootPane {
     private final ArrayList<SegmentCoordinateWrapper> firstPlayerSnake = new ArrayList<>();
     private final ArrayList<SegmentCoordinateWrapper> secondPlayerSnake = new ArrayList<>();
     private final ArrayList<SnakeSegment> cookieStack = new ArrayList<>();
-    private Direction firstPlayerDirection = Direction.RIGHT;
-    private Direction secondPlayerDirection = Direction.LEFT;
+    private Direction firstPlayerDirection;
+    private Direction secondPlayerDirection;
 
     private Score firstPlayerScore;
     private Score secondPlayerScore;
@@ -83,6 +83,9 @@ public class TronSnake extends GameRootPane {
                 removeSprite(newCookie);
             }
         }
+
+        firstPlayerDirection = Direction.RIGHT;
+        secondPlayerDirection = Direction.LEFT;
 
         // bind keys
         this.getScene().setOnKeyPressed( event -> {
