@@ -42,6 +42,7 @@ public class MainMenu extends StackPane{
 	String font = "press-start.ttf";
 	public MediaPlayer bgMusic;
 	String appDataPath;
+	boolean betterIntroSong = false; // I'm not bitter at all. not at all.
 	
 	public MainMenu () {
 		
@@ -121,7 +122,8 @@ public class MainMenu extends StackPane{
 	    	else {
 	    		dataFile.mkdir();
 	    		bgMusic.play();
-	    		firstLaunchFanciness();
+	    		if (betterIntroSong) firstLaunchFancinessFOR_SONG_ONE();
+	    		else firstLaunchFanciness();
 	    	}
     	}
     	catch (IOException e) {e.printStackTrace();}
@@ -146,8 +148,8 @@ public class MainMenu extends StackPane{
 											  moveTo(title,13475,-530));
 		titleTimeline.play();
 		Timeline backgroundTimeline = new Timeline (opacity(blackScreen,0,100),
-													opacity(blackScreen,12664,100),
-													opacity(blackScreen,13475,0));
+													opacity(blackScreen,13475,0),
+													visible(blackScreen,13475,false));
 													
 		backgroundTimeline.play();
 	}
