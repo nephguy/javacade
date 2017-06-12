@@ -9,6 +9,7 @@ import javafx.geometry.Pos;
 public class SpaceInvaders extends GameRootPane {
 	
 	PixelSprite ship;
+	PixelSprite bullet;
 	PixelSprite invader1;
 	PixelSprite invader2;
 	PixelSprite wallLeft;
@@ -24,7 +25,7 @@ public class SpaceInvaders extends GameRootPane {
 	boolean movingDown = false;
 	boolean bulletImpacted = false;
 	
-	Score score = new Score(this, 20, Color.WHITE, Color.TRANSPARENT, Pos.TOP_CENTER);
+	Score score;
 	ArrayList<PixelSprite> listBullets = new ArrayList<PixelSprite>();
 	ArrayList<PixelSprite> listInv1 = new ArrayList<PixelSprite>();
 	ArrayList<PixelSprite> listInv2 = new ArrayList<PixelSprite>();
@@ -46,9 +47,8 @@ public class SpaceInvaders extends GameRootPane {
 			public boolean fireOnce() {return true;}
 			public void action () {
 				if (!bulletExists) {
-					PixelSprite bullet = new PixelSprite(spriteBullet,5,10,Color.WHITE);
+					bullet = new PixelSprite(spriteBullet,5,10,Color.WHITE);
 					addSprite(bullet, shipPosX, 550);
-					listBullets.add(bullet);
 					bulletExists = true;
 				}
 			}
@@ -58,7 +58,7 @@ public class SpaceInvaders extends GameRootPane {
 			public boolean fireOnce() {return false;}
 			public void action () {
 				ship.translate(-10, 0);
-				if (shipPosX > 25) shipPosX -= 10;
+				if (shipPosX > 30) shipPosX -= 10;
 				
 			}
 		});
@@ -83,6 +83,7 @@ public class SpaceInvaders extends GameRootPane {
 		shipPosX = 300;
 		invadersLeft = 16;
 		setBackground(Color.BLACK);
+		score = new Score(this, 20, Color.WHITE, Color.TRANSPARENT, Pos.TOP_CENTER);
 		// Sprite Arrays
 		int[][] spriteShip = new int [][]{{0,0,0,0,0,0,1,0,0,0,0,0,0},
 										  {0,0,0,0,0,1,1,1,0,0,0,0,0},
@@ -172,25 +173,18 @@ public class SpaceInvaders extends GameRootPane {
 		});
 		movingDown = false;
 		// Bullet Impact Check And Kill
-		listBullets.forEach(b -> {
-			b.translate(0, -20);
-			if (b.collided("enemy")) {
-				removeSprite(b.getCollided("enemy"));
-				bulletImpacted = true;
+		if (bulletExists) {
+			bullet.translate(0, -20);
+			if ((!listInv1.isEmpty() || !listInv1.isEmpty()) && bullet.collided("enemy")) {
+				removeSprite(bullet.getCollided("enemy"));
+				removeSprite(bullet);
 				score.addToScore(10);
 				bulletExists = false;
 				invadersLeft--;
-			}
-			if (b.collided(wallTop)) {
-				bulletImpacted = true;
+			} else if (bullet.collided(wallTop)) {
+				removeSprite(bullet);
 				bulletExists = false;
 			}
-		});
-		// Bullet Removal Based On Impact
-		if (bulletImpacted) {
-			removeSprite(listBullets.get(0));
-			listBullets.clear();
-			bulletImpacted = false;
 		}
 		// End Game 
 		if (invadersLeft == 0) { // Player Wins, New Enemies Spawn
@@ -201,7 +195,6 @@ public class SpaceInvaders extends GameRootPane {
 				addSprite(listInv2.get(listNum), x, 175);
 				listNum++;
 			}
-			shipPosX = 300;
 			invadersLeft = 16;
 		} else if (wallBottom.collided("enemy")) { // Player Loses, Game Over
 			removeSprite(ship);
